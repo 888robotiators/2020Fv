@@ -9,6 +9,9 @@ package frc.robot;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import disc.data.Scenario;
 import disc.data.WaypointMap;
@@ -42,6 +45,7 @@ public class Robot extends TimedRobot {
     Scenario autoScenario;
     Directory autoFeatures;
     Interpreter auto;
+    ExecutorService executor = Executors.newSingleThreadExecutor();
 
     // Pneumatics
     Compressor compressor;
@@ -77,7 +81,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        auto.start();
+        executor.submit(auto);
     }
 
     @Override
