@@ -71,6 +71,8 @@ public class Navigation {
         //receive = p_receive;
 
         servo = new Servo(0);
+        // destination = waypoints.get("TwoFootTestPoint");
+        // autoSpeed = 0.3;
 
     }
 
@@ -80,10 +82,6 @@ public class Navigation {
     public void navTeleopPeriodic() {
         getButton();
         manualDrive();
-    }
-
-    public void navAutoPeriodic() {
-        autoMove();
     }
 
     /**
@@ -164,20 +162,6 @@ public class Navigation {
 
         }
 
-    }
-
-    public void autoMove() {
-        if (travel) {
-            if (guidance.goToWaypoint(destination, autoSpeed)) {
-                travel = false;
-            }
-        }
-    }
-
-    public void goTo(String waypointName, double speed) {
-        destination = waypoints.get(waypointName);
-        autoSpeed = speed;
-        travel = true;
     }
 
     /**

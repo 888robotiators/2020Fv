@@ -9,17 +9,11 @@ package frc.robot;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import disc.data.Scenario;
 import disc.data.WaypointMap;
-import disc.tools.Directory;
-import disc.tools.Interpreter;
 
 import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -43,9 +37,7 @@ public class Robot extends TimedRobot {
     WaypointMap waypoints;
 
     Scenario autoScenario;
-    Directory autoFeatures;
-    Interpreter auto;
-    ExecutorService executor = Executors.newSingleThreadExecutor();
+    Commander auto;
 
     // Pneumatics
     Compressor compressor;
@@ -74,26 +66,26 @@ public class Robot extends TimedRobot {
 
         compressor = new Compressor(RobotMap.PCM);
 
-        autoFeatures = new Directory(nav);
-        auto = new Interpreter(autoFeatures, autoScenario);
+        auto = new Commander(autoScenario, waypoints, guidence);
+
+        // robot kermits sause
 
     }
 
     @Override
     public void autonomousInit() {
-        executor.submit(auto);
+        location.reset();
     }
 
     @Override
     public void autonomousPeriodic() {
-        //receive.receiveMessage();
         location.updateTracker();
-        nav.navAutoPeriodic();
+        location.updateDashboard();
+        auto.periodic();
     }
 
     @Override
     public void teleopInit() {
-        auto.interrupt();
         compressor.setClosedLoopControl(true);
     }
 
@@ -101,6 +93,7 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
         //receive.receiveMessage();
         location.updateTracker();
+        location.updateDashboard();
         nav.navTeleopPeriodic();
     }
 

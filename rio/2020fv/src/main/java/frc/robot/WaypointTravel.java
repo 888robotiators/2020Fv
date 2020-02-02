@@ -1,6 +1,7 @@
 package frc.robot;
 
 import disc.data.Waypoint;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class WaypointTravel {
 
@@ -52,10 +53,11 @@ public class WaypointTravel {
             headingDifference -= 360;
         }
 
+        SmartDashboard.putNumber("State", state);
+
         switch (state) {
 
             case 0:
-                location.reset();
                 if (Math.abs(desiredX) < 0.1 && Math.abs(desiredY) < 0.1) {
                     state = 3;
                 }
@@ -75,9 +77,15 @@ public class WaypointTravel {
                     headingDifference -= 360;
                 }
 
+                double course = headingDifference;
+
+                if (speed < 0) {
+                    course = RobotMath.modAngleDegrees(headingDifference + 180);
+                }
+
                 // If the robot is not within 4 degrees of its target heading...
-                if (Math.abs(headingDifference) > RobotMap.ANGLE_TOLERENCE) {
-                    double[] rotationSpeed = turn(headingDifference, speed);
+                if (Math.abs(course) > RobotMap.ANGLE_TOLERENCE) {
+                    double[] rotationSpeed = turn(course, speed);
                     drive.move(-rotationSpeed[0], -rotationSpeed[1]);
                 }
 
@@ -155,7 +163,7 @@ public class WaypointTravel {
      * @param speed The speed at which the robot should travel.
      * @return The speed for the left and right sides of the robot.
      */
-    public double[] move(double angle, double speed) {
+    private double[] move(double angle, double speed) {
         double heading = RobotMath.modAngleDegrees(location.getHeading());
 
         double headingDifference = angle;
@@ -298,7 +306,7 @@ public class WaypointTravel {
      * @param desiredY Final y position.
      * @return Heading difference in degrees.
      */
-    public double findDesiresdAngle(double desiredX, double desiredY) {
+    private double findDesiresdAngle(double desiredX, double desiredY) {
         double heading = location.getHeading();
 
         // Calculates the direction the robot should travel in to get to the
@@ -316,10 +324,6 @@ public class WaypointTravel {
 
         return headingDifference;
 
-    }
-
-    public void resetState() {
-        state = 0;
     }
 
 }
