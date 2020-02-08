@@ -1,0 +1,3 @@
+##name=test
+nav.goTo,TwoFootTestPoint,0.3
+nav.goTo,TwoFootNegTestPoint, -0.3
