@@ -90,8 +90,4 @@ public class OI {
         return (leftStick.getRawButton(1) && rightStick.getRawButton(1));
     }
 
-    public enum ControllerButton {
-        BUTTON_A, BUTTON_B, BUTTON_X, BUTTON_Y, BUTTON_NULL;
-
-    }
 }

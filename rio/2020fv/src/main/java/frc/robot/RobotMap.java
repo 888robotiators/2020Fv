@@ -19,16 +19,12 @@ public class RobotMap {
     public static final int DS_REVERSE_CHANNEL = 1;
     public static final int DS_FORWARD_CHANNEL = 0;
 
-    // ID for Joysticks
-    public static final int DRIVESTICK = 0;
-    public static final int GAMEPAD = 1;
-
-    public static final double JOYSTICK_DEADZONE = 0.3;
-
     // USB IDs in the DS for the controller.
     public static final int LEFT_JOYSTICK = 0;
     public static final int RIGHT_JOYSTICK = 1;
     public static final int GAMEPAD_PORT = 2;
+  
+    public static final double JOYSTICK_DEADZONE = 0.3;
 
     // Button ID values on the Joysticks
     public static final int JOYSTICK_TRIGGER = 1;
@@ -65,4 +61,25 @@ public class RobotMap {
     public static final double COLOR_WHEEL_SPEED = 0.75;
 
     public static final int JETSON_SOCKET = 5555;
+
+    // ID for other motor controllers
+    public static final int ELEVATOR_MOTOR = 20;
+    public static final int BALL_INTAKE_MOTOR = 21;
+
+    // IDs for pneumatic controls
+    public static final int PCM = 5;
+    public static final int SOLENOID = 1;
+
+    public static final int RECEIVER_SOCKET = 5806;
+
+    public static final double JOYSTICK_DEADZONE = 0.1;
+    public static final double RAMP_RATE = 0.2;
+
+    public static final double CLICKS_PER_INCH = 0.439373614;
+    public static final double WHEEL_BASE = CLICKS_PER_INCH * 21.5;
+
+    public static final double POSITION_TOLERENCE = 4;
+    public static final double ANGLE_TOLERENCE = 4;
+
+
 }
