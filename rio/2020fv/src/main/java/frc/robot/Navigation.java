@@ -7,8 +7,6 @@
 
 package frc.robot;
 
-import disc.data.Waypoint;
-import disc.data.WaypointMap;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -20,15 +18,9 @@ public class Navigation {
     OI oi;
     DriveTrain drive;
     WaypointTravel guidance;
-    //UDPReceiver receive;
 
-    WaypointMap waypoints;
 
     Servo servo;
-
-    ControllerButton gamepadButton = ControllerButton.BUTTON_NULL;
-
-    Waypoint destination;
 
     double[] targetData;
 
@@ -43,15 +35,6 @@ public class Navigation {
     boolean brakeButtonLast = false;
     boolean press = false;
 
-    boolean aButton = false;
-    boolean bButton = false;
-    boolean xButton = false;
-    boolean yButton = false;
-    boolean aButtonLast = false;
-    boolean bButtonLast = false;
-    boolean xButtonLast = false;
-    boolean yButtonLast = false;
-
     boolean travel = false;
 
     /**
@@ -62,12 +45,11 @@ public class Navigation {
      * @param p_guidance Global {@link WaypointTravel} object
      * @param p_receive Global {@link UDPReceiver} object
      */
-    public Navigation(OI oi, DriveTrain drive, WaypointTravel guidance, WaypointMap waypoints) { //           UDPReceiver p_receive) {
+    public Navigation(OI oi, DriveTrain drive, WaypointTravel guidance) { //           UDPReceiver p_receive) {
 
         this.oi = oi;
         this.drive = drive;
         this.guidance = guidance;
-        this.waypoints = waypoints;
         //receive = p_receive;
 
         servo = new Servo(0);
@@ -80,7 +62,6 @@ public class Navigation {
      * Method to be run periodically while the robot in enabled.
      */
     public void navTeleopPeriodic() {
-        getButton();
         manualDrive();
     }
 
@@ -173,37 +154,4 @@ public class Navigation {
         return reverse;
     }
 
-    /**
-     * Updates an an enum that holds the last command from the gamepad letter
-     * buttons.
-     */
-    public void getButton() {
-        aButtonLast = aButton;
-        bButtonLast = bButton;
-        xButtonLast = xButton;
-        yButtonLast = yButton;
-
-        aButton = oi.getGamepadButton(RobotMap.A_BUTTON);
-        bButton = oi.getGamepadButton(RobotMap.B_BUTTON);
-        xButton = oi.getGamepadButton(RobotMap.X_BUTTON);
-        yButton = oi.getGamepadButton(RobotMap.Y_BUTTON);
-
-        if (aButton) {
-            gamepadButton = ControllerButton.BUTTON_A;
-        }
-        else if (bButton) {
-            gamepadButton = ControllerButton.BUTTON_B;
-        }
-        else if (xButton) {
-            gamepadButton = ControllerButton.BUTTON_X;
-        }
-        else if (yButton) {
-            gamepadButton = ControllerButton.BUTTON_Y;
-        }
-    }
-
-    public enum ControllerButton {
-        BUTTON_A, BUTTON_B, BUTTON_X, BUTTON_Y, BUTTON_NULL;
-
-    }
 }

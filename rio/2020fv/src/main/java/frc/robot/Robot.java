@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
         guidence = new WaypointTravel(drive, location);
         send = new UDPSender();
         receive = new UDPReceiver();
-        nav = new Navigation(oi, drive, guidence, waypoints);
+        nav = new Navigation(oi, drive, guidence);
 
         compressor = new Compressor(RobotMap.PCM);
 

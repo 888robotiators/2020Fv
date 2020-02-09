@@ -60,7 +60,7 @@ public class Indexing {
 
     }
 
-    public boolan hasBalls() {
+    public boolean hasBalls() {
         return true;
     }
 }
