@@ -7,11 +7,8 @@
 
 package frc.robot;
 
-import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
-
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -30,36 +27,26 @@ public class Robot extends TimedRobot {
     OI oi;
     Shooter shooter;
     Turret turret;
-    UDPReceiver receive;
-    UDPSender sender;
-    UsbCamera camera0;
-    UsbCamera camera1;
-    JetsonLight jetsonLight;
-    
 
     // Pneumatics
     Compressor compressor;
 
     @Override
     public void robotInit() {
-        receive = new UDPReceiver();
-        sender = new UDPSender();
+
         oi = new OI();
         drive = new DriveTrain();
         nav = new Navigation(oi, drive);//, guidence);
         intake = new Intake(oi);
         index = new Indexing(oi, intake);
         climb = new Climber(oi);
+        shooter = new  Shooter(oi, index);
         turret = new Turret(oi);
-        jetsonLight = new JetsonLight(oi);
-        shooter = new  Shooter(oi, index, receive, turret);
 
         compressor = new Compressor(RobotMap.PCM);
 
-        camera0 = CameraServer.getInstance().startAutomaticCapture(0);
-        camera1 = CameraServer.getInstance().startAutomaticCapture(1);
-    
         // robot kermits sause
+
     }
 
     @Override
@@ -74,7 +61,6 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         compressor.setClosedLoopControl(true);
-        //sender.sendMessage();
     }
 
     @Override
@@ -84,13 +70,13 @@ public class Robot extends TimedRobot {
         intake.intakeTeleopPeriodic();
         index.indexPeriodic();
         shooter.shooterTeleopPeriodic();
-        //jetsonLight.jetsonLightPeriodic();
+        
         turret.turretTeleopPeriodic();
-        //receive.run();
     }
 
     @Override
     public void testPeriodic() {
 
     }
+
 }

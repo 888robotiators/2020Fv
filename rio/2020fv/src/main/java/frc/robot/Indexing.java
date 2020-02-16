@@ -34,15 +34,7 @@ public class Indexing {
     boolean ballInPos3;
     boolean ballInPos4;
 
-    //funnel = if (B4) , dom n gert gave me this -> if((!B0 && !B1 && !B2) || intake.intakeRunning())
-    //middle = if (!B0 && B1) || (!B1 && B2) || (!B2 && B3)
-    //upper = if (!B0 && B1)
-
     public Indexing(OI oi, Intake intake) {
-
-        this.oi = oi;
-        this.intake = intake;
-
         funnelMotor = new TalonSRX(RobotMap.FUNNEL_MOTOR_CANID);
         lowerFunnelSideIndex = new TalonSRX(
                 RobotMap.LOWER_FUNNEL_SIDE_INDEX_CANID);
@@ -63,115 +55,72 @@ public class Indexing {
         bannerPos2 = new DigitalInput(2);
         bannerPos3 = new DigitalInput(3);
         bannerPos4 = new DigitalInput(4);
+
+        this.oi = oi;
     }
 
     public void indexPeriodic() {
-        updateBallPoitions();
-
-        if(oi.getGamepadPOV() != -1) {
-            
-            if (oi.getGamepadPOV() == 0) {
-                runFunnel(.5);
-                runLowerFunnelSideIndex(.5);
-                runLowerFarSideIndex(.5);
-                runUpperBelt(.5);
-                runLoadBelt(.5);
-            }
-
-            else if (oi.getGamepadPOV() == 180) {
-                runFunnel(-0.5);
-                runLowerFunnelSideIndex(-0.5);
-                runLowerFarSideIndex(-0.5);
-                runUpperBelt(-0.5);
-                runLoadBelt(-0.50);
-            }
-
-
+        if (oi.getGamepadPOV() == 0) {
+            runFunnel(.5);
+            runLowerFunnelSideIndex(.5);
+            runLowerFarSideIndex(.5);
+            runUpperBelt(.5);
+            runLoadBelt(.5);
         }
-        
+
+        else if (oi.getGamepadPOV() == 180) {
+            runFunnel(-0.5);
+            runLowerFunnelSideIndex(-0.5);
+            runLowerFarSideIndex(-0.5);
+            runUpperBelt(-0.5);
+            runLoadBelt(-0.50);
+        }
+
         else {
-            
-            bringToTop();
-
-            // if((!ballInPos0 && !ballInPos1 && !ballInPos2) || intake.intakeRunning()) {
-            //     runFunnel(0.75);
-            // }
-            // if((!ballInPos0 && ballInPos1) || (!ballInPos1 && ballInPos2) || (!ballInPos2 && ballInPos3)) {
-            //     runLowerFarSideIndex(0.75);
-            //     runLowerFunnelSideIndex(0.75);
-            // }
-            // if (!ballInPos0 && ballInPos1) {
-            //     runUpperBelt(0.75);
-            //     runLoadBelt(0.75);
-            // }
+            stopIndexer();
         }
+
+        updateBallPoitions();
     }
 
     public void bringToTop() {
 
-        boolean[] banners = updateBallPoitions();
+        updateBallPoitions();
 
-        if (banners[4] || intake.isRunning()) {
-            runFunnel(0.5);
+        if (hasBalls()) {
+            switch (getNextBall()) {
+                case 0:
+                    stopIndexer();
+                    break;
+                case 1:
+                    runLowerFunnelSideIndex(0.5);
+                    runLowerFarSideIndex(0.5);
+                    runUpperBelt(0.5);
+                    runLoadBelt(0.0);
+                    if (ballInPos3 || ballInPos4) {
+                        runFunnel(1.0);
+                    }
+                    break;
+                case 2:
+                    runLowerFunnelSideIndex(0.5);
+                    runLowerFarSideIndex(0.5);
+                    if (ballInPos3 || ballInPos4) {
+                        runFunnel(1.0);
+                    }
+                    break;
+                case 3:
+                    runFunnel(1.0);
+                    runLowerFunnelSideIndex(0.5);
+                    runLowerFarSideIndex(0.5);
+                    break;
+                case 4:
+                    runFunnel(1.0);
+                    break;
+                default: 
+                    stopIndexer();
+                    break;
+            }
         }
-        else {
-            runFunnel(0.0);
-        }
-
-        if ((!banners[0] && banners[1]) || (!banners[1] && banners[2]) || (!banners[2] && banners[3])) {
-            runLowerFarSideIndex(0.5);
-            runLowerFunnelSideIndex(0.5);
-        }
-        else {
-            runLowerFarSideIndex(0.0);
-            runLowerFunnelSideIndex(0.0);
-        }
-
-        if (!banners[0] && banners[1]) {
-            runUpperBelt(0.5);
-            runLoadBelt(0.5);
-        }
-        else {
-            runUpperBelt(0.0);
-            runLoadBelt(0.0);
-        }
-        
-
-        // if (hasBalls()) {
-
-        //     switch (getNextBall()) {
-        //         case 0:
-        //             stopIndexer();
-        //             break;
-        //         case 1:
-        //             runLowerFunnelSideIndex(0.5);
-        //             runLowerFarSideIndex(0.5);
-        //             runUpperBelt(0.5);
-        //             runLoadBelt(0.0);
-        //             if (ballInPos3 || ballInPos4) {
-        //                 runFunnel(1.0);
-        //             }
-        //             break;
-        //         case 2:
-        //             runLowerFunnelSideIndex(0.5);
-        //             runLowerFarSideIndex(0.5);
-        //             if (ballInPos3 || ballInPos4) {
-        //                 runFunnel(1.0);
-        //             }
-        //             break;
-        //         case 3:
-        //             runFunnel(1.0);
-        //             runLowerFunnelSideIndex(0.5);
-        //             runLowerFarSideIndex(0.5);
-        //             break;
-        //         case 4:
-        //             runFunnel(1.0);
-        //             break;
-        //         default: 
-        //             stopIndexer();
-        //             break;
-        //     }
-        // }
     }
 
     public void stopIndexer() {
@@ -214,37 +163,18 @@ public class Indexing {
         return -1;
     }
 
-    public int getNumBalls() {
-        int ballsInRobot = 0;
-
-        if (ballInPos0)
-            ballsInRobot++;
-        if (ballInPos1)
-            ballsInRobot++;
-        if (ballInPos2)
-            ballsInRobot++;
-        if (ballInPos3)
-            ballsInRobot++;
-        if (ballInPos4)
-            ballsInRobot++;
-            
-        return ballsInRobot;
-    }
-
-    private boolean[] updateBallPoitions() {
+    private void updateBallPoitions() {
         ballInPos0 = bannerPos0.get();
-        ballInPos1 = !bannerPos1.get();
+        ballInPos1 = bannerPos1.get();
         ballInPos2 = bannerPos2.get();
         ballInPos3 = bannerPos3.get();
         ballInPos4 = bannerPos4.get();
 
-        SmartDashboard.putBoolean("ball 0", bannerPos0.get());
+        SmartDashboard.putBoolean("ball 0", ballInPos0);
         SmartDashboard.putBoolean("ball 1", ballInPos1);
         SmartDashboard.putBoolean("ball 2", ballInPos2);
         SmartDashboard.putBoolean("ball 3", ballInPos3);
         SmartDashboard.putBoolean("ball 4", ballInPos4);
-
-        return new boolean[] {ballInPos0, ballInPos1, ballInPos2, ballInPos3, ballInPos4};
     }
 
     private void runFunnel(double speed) {

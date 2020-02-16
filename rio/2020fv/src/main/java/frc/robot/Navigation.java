@@ -88,7 +88,7 @@ public class Navigation {
 
         // Gets joystick values.
         double leftStickValue = oi.getLeftStickAxis(RobotMap.JOYSTICK_Y_AXIS);
-        double rightStickValue = oi.getRightStickAxis(RobotMap.JOYSTICK_3D_Y_AXIS);
+        double rightStickValue = oi.getRightStickAxis(RobotMap.JOYSTICK_Y_AXIS);
 
         SmartDashboard.putNumber("Left joystick", leftStickValue);
         SmartDashboard.putNumber("Right joystick", rightStickValue);

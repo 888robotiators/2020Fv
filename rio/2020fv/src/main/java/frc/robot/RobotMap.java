@@ -87,6 +87,5 @@ public class RobotMap {
     public static final double POSITION_TOLERENCE = 4;
     public static final double ANGLE_TOLERENCE = 4;
 
-    public static final int JETSON_SOCKET = 5555;
 
 }

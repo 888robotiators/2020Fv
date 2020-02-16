@@ -25,7 +25,7 @@ public class Turret {
 
     public Turret(OI oi) {
         //turretMotor = new Spark(1);
-        turretMotor = new TalonSRX(26);
+        turretMotor = new TalonSRX(1);
         turretMotor.setInverted(true);
 
         encoder = new Counter(new DigitalInput(9));
@@ -48,7 +48,7 @@ public class Turret {
         // }
 
         if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_THUMB_BUTTON)) {
-            turnTurretMotor(oi.getRightStickAxis(RobotMap.JOYSTICK_3D_Z_AXIS));
+            turnTurretMotor(oi.getRightStickAxis(RobotMap.JOYSTICK_3D_Z_AXIS) );
         }
 
         else {
@@ -66,14 +66,14 @@ public class Turret {
         return false;
     }
 
-    public void turnTurretMotor(double speed) {
+    private void turnTurretMotor(double speed) {
         //turretMotor.set(speed);
         turretMotor.set(ControlMode.PercentOutput, speed);
     }
 
-    // private void resetEncoderCounter() {
-    //     encoder.reset();
-    // }
+    private void resetEncoderCounter() {
+        encoder.reset();
+    }
 
     // public boolean turnTurretTwoDegrees() { //this is what dom told me to do dont roast me please
     //     if (!complete) {

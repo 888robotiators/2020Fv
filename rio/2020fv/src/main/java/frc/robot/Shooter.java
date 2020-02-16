@@ -21,7 +21,7 @@ public class Shooter {
     protected double rpms;
     protected double targetRPM;
     protected double dist;
-    protected double SCALAR;
+    protected final double SCALAR = 13.5;
     protected double targetDistZ = 250;
 
     protected double speedMultiplier;
@@ -30,28 +30,19 @@ public class Shooter {
 
     protected boolean state;
 
-    protected UDPReceiver reciever;
-
-    protected double targetZ;
-    protected double targetYaw;
-
-    protected Turret turret;
-
     /**
      * receive
      *
      * @param oi
      * @param p_receiveS
      */
-    public Shooter(OI oi, Indexing index, UDPReceiver reciever, Turret turret) {
+    public Shooter(OI oi, Indexing index) {
         shooterMotor = new CANSparkMax(RobotMap.SHOOTER_CANID,
                 MotorType.kBrushless);
         shooterMotor.setIdleMode(IdleMode.kCoast);
         pid = shooterMotor.getPIDController();
         this.index = index;
         this.oi = oi;
-        this.reciever = reciever;
-        this.turret = turret;
 
         encoder = shooterMotor.getEncoder();
 
@@ -61,11 +52,11 @@ public class Shooter {
         state = true;
 
         pid.setFF(0);
-        pid.setP(3.25e-3);
-        pid.setI(2e-6);
+        pid.setP(1e-3);
+        pid.setI(1.75e-6);
         pid.setD(0);
 
-        pid.setIZone(500);
+        pid.setIZone(1000);
 
         // pid.setIMaxAccum(100, 0);
 
@@ -83,27 +74,9 @@ public class Shooter {
         // targetDistZ = targetData[2];
 
         rpms = encoder.getVelocity();
-        targetZ = reciever.getTarget()[2];
-        targetYaw = reciever.getTarget()[5];
-        //double angleToTarget = Math.atan2(reciever.getTarget()[0], reciever.getTarget()[2]);
         
         if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_TRIGGER)) {
-            //if (reciever.isVision()) {
-                SCALAR = (targetZ < 120) ? 14.5 : (targetZ > 240) ? 13 : 13.5; // change this monstrosity 
-                targetRPM = targetZ * SCALAR;
-                if (targetYaw > 0.35) {
-                    turret.turnTurretMotor(0.5);
-                } else if (targetYaw < -0.35) {
-                    turret.turnTurretMotor(-0.5);
-                } else {
-                    turret.turnTurretMotor(0);
-                }
-                
-                //targetRPM = 4000;
-            //}
-            //else {
-            //    targetRPM = 4000;
-            // }
+            targetRPM = 4000;
             //SmartDashboard.putBoolean("working", true);
         }
         else {
@@ -153,6 +126,7 @@ public class Shooter {
     }
 
     public void shoot(double output) {
+
         pid.setReference(output, ControlType.kVelocity);
         if (output <= 1) {
             pid.setIAccum(0);
