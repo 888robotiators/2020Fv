@@ -17,7 +17,7 @@ public class Navigation {
 
     OI oi;
     DriveTrain drive;
-    //WaypointTravel guidance;
+    WaypointTravel guidance;
 
 
     Servo servo;
@@ -45,11 +45,11 @@ public class Navigation {
      * @param p_guidance Global {@link WaypointTravel} object
      * @param p_receive Global {@link UDPReceiver} object
      */
-    public Navigation(OI oi, DriveTrain drive) { //, WaypointTravel guidance) { //           UDPReceiver p_receive) {
+    public Navigation(OI oi, DriveTrain drive, WaypointTravel guidance) { //           UDPReceiver p_receive) {
 
         this.oi = oi;
         this.drive = drive;
-        //this.guidance = guidance;
+        this.guidance = guidance;
         //receive = p_receive;
 
         servo = new Servo(0);

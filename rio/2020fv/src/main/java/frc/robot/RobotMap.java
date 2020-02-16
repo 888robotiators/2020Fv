@@ -50,7 +50,6 @@ public class RobotMap {
     public static final int JOYSTICK_3D_Y_AXIS = 1;
     public static final int JOYSTICK_3D_Z_AXIS = 2;
     public static final int JOYSTICK_3D_SLIDER_AXIS = 3;
-
  
      // Button values for gamepad
      public static final int A_BUTTON = 1;

@@ -9,6 +9,15 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
+import java.io.File;
+import java.io.FileNotFoundException;
+
+import disc.data.Scenario;
+import disc.data.WaypointMap;
+
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -28,6 +37,17 @@ public class Robot extends TimedRobot {
     Shooter shooter;
     Turret turret;
 
+    DeadReckoning location;
+
+    IMU imu;
+    WaypointTravel guidence;
+    UDPSender send;
+    UDPReceiver receive;
+    WaypointMap waypoints;
+
+    Scenario autoScenario;
+    Commander auto;
+
     // Pneumatics
     Compressor compressor;
 
@@ -36,17 +56,32 @@ public class Robot extends TimedRobot {
 
         oi = new OI();
         drive = new DriveTrain();
-        nav = new Navigation(oi, drive);//, guidence);
         intake = new Intake(oi);
         index = new Indexing(oi, intake);
         climb = new Climber(oi);
         shooter = new  Shooter(oi, index);
         turret = new Turret(oi);
+      
+        imu = new IMU();
+        location = new DeadReckoning(drive, imu);
+        guidence = new WaypointTravel(drive, location);
+        send = new UDPSender();
+        receive = new UDPReceiver();
+        nav = new Navigation(oi, drive, guidence);
 
         compressor = new Compressor(RobotMap.PCM);
 
-        // robot kermits sause
+        try {
+            waypoints = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
+            autoScenario = new Scenario(new File("/home/lvuser/TestAuto.txt"));
+            SmartDashboard.putBoolean("Suicide", false);
+        } 
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+            SmartDashboard.putBoolean("Suicide", true);
+        }
 
+        auto = new Commander(autoScenario, waypoints, guidence);
     }
 
     @Override
@@ -65,6 +100,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        location.updateTracker();
+        location.updateDashboard();
         nav.navTeleopPeriodic();
         climb.climberTeleopPeriodic();
         intake.intakeTeleopPeriodic();
