@@ -16,11 +16,12 @@ public class Intake {
     protected boolean flipButton = false;
 
     public Intake(OI oi) {
-        intakeFlipper = new DoubleSolenoid(RobotMap.DS_FORWARD_CHANNEL,
+        intakeFlipper = new DoubleSolenoid(RobotMap.PCM, RobotMap.DS_FORWARD_CHANNEL,
                 RobotMap.DS_REVERSE_CHANNEL);
         intakeMotor = new TalonSRX(RobotMap.INTAKE_CANID);
 
-        multi = 1;
+        intakeMotor.setInverted(true);
+
         this.oi = oi;
     }
 
@@ -63,6 +64,16 @@ public class Intake {
 
     public void intakeStop() {
         intakeMotor.set(ControlMode.PercentOutput, 0);
+    }
+
+    public void flipOut() {
+        if (intakeFlipper.get().equals(DoubleSolenoid.Value.kReverse))
+                intakeFlipper.set(DoubleSolenoid.Value.kForward);
+    }
+
+    public void flipIn() {
+        if (intakeFlipper.get().equals(DoubleSolenoid.Value.kForward))
+                intakeFlipper.set(DoubleSolenoid.Value.kReverse);
     }
 
 }

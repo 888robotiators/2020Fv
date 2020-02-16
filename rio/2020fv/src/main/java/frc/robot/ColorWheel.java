@@ -118,13 +118,13 @@ public class ColorWheel {
         if (!colorDesired.equals(ColorSlice.UNKNOWN)) {
             if (!(colorCurrent.equals(colorDesired))) {
                 double rotationSpeed = colorCurrent.compareTo(colorDesired);
-                rotationSpeed = Math.abs(rotationSpeed) >= 3
+                rotationSpeed = Math.abs(rotationSpeed) > 2
                         ? -Math.signum(rotationSpeed)
                         : Math.signum(rotationSpeed);
                 rotateManual(rotationSpeed * RobotMap.COLOR_WHEEL_SPEED);
             }
             else {
-                colorWheelMotor.set(ControlMode.PercentOutput, 0);
+                rotateManual(0.0);
                 gamepadButton = ControllerButton.BUTTON_NULL;
             }
         }

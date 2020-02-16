@@ -24,9 +24,6 @@ public class DriveTrain {
     CANPIDController frontRight_PID;
     CANPIDController rearRight_PID;
 
-  
-
-
     double rightEncoderOffset;
     double leftEnccoderOffset;
 

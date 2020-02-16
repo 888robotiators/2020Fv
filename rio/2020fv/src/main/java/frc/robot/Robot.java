@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.TimedRobot;
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -26,10 +28,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
     /* Here are the instantiations of everything used in the class */
-    OI oi;
+    Climber climb;
     DriveTrain drive;
-    DeadReckoning location;
+    Indexing index;
+    Intake intake;
     Navigation nav;
+    OI oi;
+    Shooter shooter;
+    Turret turret;
+
+    DeadReckoning location;
+
     IMU imu;
     WaypointTravel guidence;
     UDPSender send;
@@ -44,19 +53,15 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        
-        try {
-            waypoints = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
-            autoScenario = new Scenario(new File("/home/lvuser/TestAuto.txt"));
-            SmartDashboard.putBoolean("Suicide", false);
-        } 
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-            SmartDashboard.putBoolean("Suicide", true);
-        }
-        
+
         oi = new OI();
         drive = new DriveTrain();
+        intake = new Intake(oi);
+        index = new Indexing(oi, intake);
+        climb = new Climber(oi);
+        shooter = new  Shooter(oi, index);
+        turret = new Turret(oi);
+      
         imu = new IMU();
         location = new DeadReckoning(drive, imu);
         guidence = new WaypointTravel(drive, location);
@@ -66,22 +71,26 @@ public class Robot extends TimedRobot {
 
         compressor = new Compressor(RobotMap.PCM);
 
+        try {
+            waypoints = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
+            autoScenario = new Scenario(new File("/home/lvuser/TestAuto.txt"));
+            SmartDashboard.putBoolean("Suicide", false);
+        } 
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+            SmartDashboard.putBoolean("Suicide", true);
+        }
+
         auto = new Commander(autoScenario, waypoints, guidence);
-
-        // robot kermits sause
-
     }
 
     @Override
     public void autonomousInit() {
-        location.reset();
+        //location.reset();
     }
 
     @Override
     public void autonomousPeriodic() {
-        location.updateTracker();
-        location.updateDashboard();
-        auto.periodic();
     }
 
     @Override
@@ -91,10 +100,15 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        //receive.receiveMessage();
         location.updateTracker();
         location.updateDashboard();
         nav.navTeleopPeriodic();
+        climb.climberTeleopPeriodic();
+        intake.intakeTeleopPeriodic();
+        index.indexPeriodic();
+        shooter.shooterTeleopPeriodic();
+        
+        turret.turretTeleopPeriodic();
     }
 
     @Override
