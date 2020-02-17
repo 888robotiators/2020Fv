@@ -9,14 +9,15 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
+
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 import disc.data.Scenario;
 import disc.data.WaypointMap;
 
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -36,6 +37,7 @@ public class Robot extends TimedRobot {
     OI oi;
     Shooter shooter;
     Turret turret;
+    ExecutorService receiveRunner = Executors.newSingleThreadExecutor();
 
     DeadReckoning location;
 
@@ -59,7 +61,6 @@ public class Robot extends TimedRobot {
         intake = new Intake(oi);
         index = new Indexing(oi, intake);
         climb = new Climber(oi);
-        shooter = new  Shooter(oi, index);
         turret = new Turret(oi);
       
         imu = new IMU();
@@ -68,6 +69,8 @@ public class Robot extends TimedRobot {
         send = new UDPSender();
         receive = new UDPReceiver();
         nav = new Navigation(oi, drive, guidence);
+
+        shooter = new  Shooter(oi, index, receive);
 
         compressor = new Compressor(RobotMap.PCM);
 
@@ -81,21 +84,26 @@ public class Robot extends TimedRobot {
             SmartDashboard.putBoolean("Suicide", true);
         }
 
-        auto = new Commander(autoScenario, waypoints, guidence);
+        auto = new Commander(autoScenario, waypoints, location, guidence, intake, index, shooter);
     }
 
     @Override
     public void autonomousInit() {
-        //location.reset();
+        location.reset();
     }
 
     @Override
     public void autonomousPeriodic() {
+        location.updateTracker();
+        location.updateDashboard();
+        auto.periodic();
     }
 
     @Override
     public void teleopInit() {
         compressor.setClosedLoopControl(true);
+        location.reset();
+        //send.sendMessage();
     }
 
     @Override
@@ -107,7 +115,7 @@ public class Robot extends TimedRobot {
         intake.intakeTeleopPeriodic();
         index.indexPeriodic();
         shooter.shooterTeleopPeriodic();
-        
+        //receiveRunner.submit(receive);
         turret.turretTeleopPeriodic();
     }
 

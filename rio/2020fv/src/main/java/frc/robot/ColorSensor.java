@@ -9,10 +9,10 @@ import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorMatch;
 
 public class ColorSensor {
-    protected ColorSensorV3 sensor;
-    protected ColorMatch matcher;
+    private ColorSensorV3 sensor;
+    private ColorMatch matcher;
 
-    ColorSlice color;
+    private ColorSlice color;
 
     // Colors
     protected final Color RED_TARGET = ColorMatch.makeColor(255, 0, 0);

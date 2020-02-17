@@ -26,7 +26,7 @@ public class Navigation {
 
     double autoSpeed;
 
-    boolean reverse = false;
+    boolean reverse = true;
     boolean reverseButton = false;
     boolean reverseButtonLast = false;
 

@@ -11,26 +11,26 @@ import frc.robot.OI.ControllerButton;
 
 public class ColorWheel {
 
-    OI oi;
+    private OI oi;
 
-    TalonSRX colorWheelMotor;
+    private TalonSRX colorWheelMotor;
 
-    ColorSensor colorSensor;
-    final I2C.Port i2cPort = I2C.Port.kOnboard;
+    private ColorSensor colorSensor;
+    private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
-    ControllerButton gamepadButton = ControllerButton.BUTTON_NULL;
-    ControllerButton gamepadButtonLast = ControllerButton.BUTTON_NULL;
+    private ControllerButton gamepadButton = ControllerButton.BUTTON_NULL;
+    private ControllerButton gamepadButtonLast = ControllerButton.BUTTON_NULL;
 
-    ColorSlice colorCurrent;
-    ColorSlice colorStarting;
-    ColorSlice colorLast;
+    private ColorSlice colorCurrent;
+    private ColorSlice colorStarting;
+    private ColorSlice colorLast;
 
-    double counter;
+    private double counter;
 
-    boolean aButton = false;
-    boolean bButton = false;
-    boolean xButton = false;
-    boolean yButton = false;
+    private boolean aButton = false;
+    private boolean bButton = false;
+    private boolean xButton = false;
+    private boolean yButton = false;
 
     public ColorWheel(OI oi) {
         this.oi = oi;

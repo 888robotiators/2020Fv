@@ -15,6 +15,8 @@ public class Intake {
     protected boolean flipButtonLast = false;
     protected boolean flipButton = false;
 
+    private boolean isRunning = false;
+
     public Intake(OI oi) {
         intakeFlipper = new DoubleSolenoid(RobotMap.PCM, RobotMap.DS_FORWARD_CHANNEL,
                 RobotMap.DS_REVERSE_CHANNEL);
@@ -48,32 +50,44 @@ public class Intake {
 
     public void flipIntake(boolean flip) {
         if (flip) {
-            if (intakeFlipper.get().equals(DoubleSolenoid.Value.kReverse))
+            
+            if (intakeFlipper.get().equals(DoubleSolenoid.Value.kReverse)) {
                 intakeFlipper.set(DoubleSolenoid.Value.kForward);
-            else intakeFlipper.set(DoubleSolenoid.Value.kReverse);
+            }            
+            
+            else {
+                intakeFlipper.set(DoubleSolenoid.Value.kReverse);
+            }
         }
     }
 
     public void intakeIn() {
         intakeMotor.set(ControlMode.PercentOutput, 0.75);
+        isRunning = true;
     }
 
     public void intakeReverse() {
         intakeMotor.set(ControlMode.PercentOutput, -0.75);
+        isRunning = true;
     }
 
     public void intakeStop() {
         intakeMotor.set(ControlMode.PercentOutput, 0);
+        isRunning = false;
     }
 
-    public void flipOut() {
+    public void flipDown() {
         if (intakeFlipper.get().equals(DoubleSolenoid.Value.kReverse))
                 intakeFlipper.set(DoubleSolenoid.Value.kForward);
     }
 
-    public void flipIn() {
+    public void flipUp() {
         if (intakeFlipper.get().equals(DoubleSolenoid.Value.kForward))
                 intakeFlipper.set(DoubleSolenoid.Value.kReverse);
+    }
+
+    public boolean isRunning() {
+        return isRunning;
     }
 
 }

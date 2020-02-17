@@ -9,24 +9,29 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Commander {
 
-    Scenario scenario;
-    WaypointMap waypoints;
+    private Scenario scenario;
+    private  WaypointMap waypoints;
 
-    Instruction current;
-    String[] currentArgs;
-    Queue<Instruction> queue;
+    private Instruction current;
+    private String[] currentArgs;
+    private Queue<Instruction> queue;
 
-    WaypointTravel guidance;
+    private WaypointTravel guidance;
+    //private DeadReckoning location;
+    private Intake intake;
+    //private Indexing index;
+    //private Shooter shooter;
 
-    int counter = 0;
+    private int counter = 0;
 
-    boolean isDone = true;
+    private boolean isDone = true;
 
-    Commander(Scenario scenario, WaypointMap waypoints, WaypointTravel guidance) {
+    Commander(Scenario scenario, WaypointMap waypoints, DeadReckoning location, 
+            WaypointTravel guidance, Intake intake, Indexing index, Shooter shooter) {
         this.scenario = scenario;
         this.waypoints = waypoints;
 
-        queue = scenario.getInstructionQueue();
+        queue = this.scenario.getInstructionQueue();
         current = null;
 
         this.guidance = guidance;
@@ -80,6 +85,26 @@ public class Commander {
                 case "shooter":
                     break;
                 case "intake":
+                        if (currentArgs[0].equalsIgnoreCase("intakeDown")) {
+                            intake.flipDown();
+                            isDone = true;
+                        }
+                        if (currentArgs[0].equalsIgnoreCase("intakeUp")) {
+                            intake.flipUp();
+                            isDone = true;
+                        }
+                        if (currentArgs[0].equalsIgnoreCase("intakeRun")) {
+                            intake.intakeIn();
+                            isDone = true;
+                        }
+                        if (currentArgs[0].equalsIgnoreCase("intakeRun")) {
+                            intake.intakeIn();
+                            isDone = true;
+                        }
+                        if (currentArgs[0].equalsIgnoreCase("intakeStop")) {
+                            intake.intakeStop();
+                            isDone = true;
+                        }
                     break;
                 default:
                     isDone = true;

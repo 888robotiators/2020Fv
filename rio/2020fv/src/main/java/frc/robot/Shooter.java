@@ -1,4 +1,4 @@
-package frc.robot; //kidnap all the robot code
+package frc.robot;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
@@ -6,11 +6,12 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
-// import edu.wpi.first.wpilibj.GearTooth;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter {
-    OI oi;
+    private OI oi;
+    private UDPReceiver recieve;
+    private Indexing index;
 
     CANSparkMax shooterMotor;
     CANPIDController pid;
@@ -26,9 +27,6 @@ public class Shooter {
 
     protected double speedMultiplier;
 
-    protected Indexing index;
-
-    protected boolean state;
 
     /**
      * receive
@@ -36,27 +34,26 @@ public class Shooter {
      * @param oi
      * @param p_receiveS
      */
-    public Shooter(OI oi, Indexing index) {
+    public Shooter(OI oi, Indexing indexm, UDPReceiver recieve) {
         shooterMotor = new CANSparkMax(RobotMap.SHOOTER_CANID,
                 MotorType.kBrushless);
         shooterMotor.setIdleMode(IdleMode.kCoast);
         pid = shooterMotor.getPIDController();
         this.index = index;
         this.oi = oi;
+        this.recieve = recieve;
 
         encoder = shooterMotor.getEncoder();
 
         rpms = 0;
-        targetRPM = 0;
-
-        state = true;
+        targetRPM = 3700;
 
         pid.setFF(0);
-        pid.setP(1e-3);
-        pid.setI(1.75e-6);
+        pid.setP(3.25e-3);
+        pid.setI(3e-6);
         pid.setD(0);
 
-        pid.setIZone(1000);
+        pid.setIZone(500);
 
         // pid.setIMaxAccum(100, 0);
 
@@ -64,6 +61,7 @@ public class Shooter {
 
         shooterMotor.setClosedLoopRampRate(0.1);
         shooterMotor.setOpenLoopRampRate(0.1);
+
 
     }
 
@@ -76,18 +74,23 @@ public class Shooter {
         rpms = encoder.getVelocity();
         
         if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_TRIGGER)) {
-            targetRPM = 4000;
+            //targetRPM = recieve.getTarget()[2] * 14;
+            shoot(targetRPM);
             //SmartDashboard.putBoolean("working", true);
         }
         else {
-            targetRPM = 0;
+            shoot(0);
             // pid.setIAccum​(0.0);
             // talon.config_kI(0, 0, 0);
             // talon.configClearPositionOnQuadIdx(true, 5);
             // shoot(0);
         }
 
-        shoot(targetRPM);
+        if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_UPPER_LEFT_BUTTON))
+            targetRPM+=10;
+        if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_LOWER_LEFT_BUTTON))
+            targetRPM-=10;
+        
 
         // if (targetRPM > rpms) {
         //     shooterMotor.set(1.0);

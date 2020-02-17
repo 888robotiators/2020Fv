@@ -11,8 +11,8 @@ public class Turret {
     //Spark turretMotor;
     TalonSRX turretMotor;
 
-    DigitalInput leftLimitSwitch;
-    DigitalInput rightLimitSwitch;
+    //DigitalInput leftLimitSwitch;
+    //DigitalInput rightLimitSwitch;
 
     Counter encoder;
 
@@ -25,13 +25,10 @@ public class Turret {
 
     public Turret(OI oi) {
         //turretMotor = new Spark(1);
-        turretMotor = new TalonSRX(1);
+        turretMotor = new TalonSRX(RobotMap.TURRET_CANID);
         turretMotor.setInverted(true);
 
-        encoder = new Counter(new DigitalInput(9));
-
-        leftLimitSwitch = new DigitalInput(5);
-        rightLimitSwitch = new DigitalInput(6);
+        encoder = new Counter(new DigitalInput(RobotMap.TURRET_ENCODER_CHANNEL));
 
         this.oi = oi;
     }
@@ -47,14 +44,15 @@ public class Turret {
         //     turnTurretMotor(0.0);
         // }
 
-        if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_THUMB_BUTTON)) {
-            turnTurretMotor(oi.getRightStickAxis(RobotMap.JOYSTICK_3D_Z_AXIS) );
+        double input = oi.getRightStickAxis(RobotMap.JOYSTICK_3D_Z_AXIS);
+
+        if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_THUMB_BUTTON) && Math.abs(input) > 0.1) {
+               turnTurretMotor(input);
         }
 
         else {
             turnTurretMotor(0.0);
         }
-
 
         SmartDashboard.putNumber("turret", encoder.get());
 
@@ -67,28 +65,13 @@ public class Turret {
     }
 
     private void turnTurretMotor(double speed) {
-        //turretMotor.set(speed);
-        turretMotor.set(ControlMode.PercentOutput, speed);
+        if ((speed > 0 && turretMotor.isFwdLimitSwitchClosed() != 1) || 
+                (speed < 0 && turretMotor.isRevLimitSwitchClosed() != 1)) {
+            turretMotor.set(ControlMode.PercentOutput, speed);
+        }
+        else {
+            turretMotor.set(ControlMode.PercentOutput, 0.0);
+        }
     }
-
-    private void resetEncoderCounter() {
-        encoder.reset();
-    }
-
-    // public boolean turnTurretTwoDegrees() { //this is what dom told me to do dont roast me please
-    //     if (!complete) {
-    //         turnTurretMotor(0.5);
-    //     }
-
-    //     if(encoder.get() - lastEncoderCount > 2) {
-    //         complete = true;
-    //         turnTurretMotor(0);
-    //     }
-    //     else {
-    //         complete = false;
-    //     }
-
-    //     return complete;
-    // }
 
 }

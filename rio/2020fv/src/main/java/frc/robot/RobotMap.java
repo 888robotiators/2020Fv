@@ -19,6 +19,9 @@ public class RobotMap {
     public static final int COLOR_WHEEL_MOTOR_CANID = 888;
     public static final int DS_REVERSE_CHANNEL = 1;
     public static final int DS_FORWARD_CHANNEL = 0;
+    public static final int TURRET_CANID = 26;
+    public static final int CLIMBER_CANID = 20;
+    public static final int JETSON_RINGLIGHT_CHANNEL = 1;
 
     // USB IDs in the DS for the controller.
     public static final int LEFT_JOYSTICK = 0;
@@ -73,18 +76,27 @@ public class RobotMap {
     public static final int PCM = 5;
     public static final int SOLENOID = 1;
 
-    public static final int RECEIVER_SOCKET = 5806;
+    public static final int RECEIVER_SOCKET = 5555;
 
     public static final double JOYSTICK_DEADZONE = 0.2;
     public static final double RAMP_RATE = 0.2;
 
-    public static final double CLICKS_PER_INCH = 0.439373614;
+    public static final double CLICKS_PER_INCH = 0.46683;
     public static final double WHEEL_BASE = CLICKS_PER_INCH * 21.5;
 
     public static final double COLOR_WHEEL_SPEED = 0.75;
 
     public static final double POSITION_TOLERENCE = 4;
     public static final double ANGLE_TOLERENCE = 4;
+
+    public static final int BALL_POS_0_CHANNEL = 0;
+    public static final int BALL_POS_1_CHANNEL = 1;
+    public static final int BALL_POS_2_CHANNEL = 2;
+    public static final int BALL_POS_3_CHANNEL = 3;
+    public static final int BALL_POS_4_CHANNEL = 4;
+
+    public static final int TURRET_ENCODER_CHANNEL = 9;
+    
 
 
 }

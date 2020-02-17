@@ -7,7 +7,7 @@ public class JetsonLight {
     protected OI oi;
 
     public JetsonLight(OI oi) {
-        jetsonLight = new Relay(1, Relay.Direction.kForward);
+        jetsonLight = new Relay(RobotMap.JETSON_RINGLIGHT_CHANNEL, Relay.Direction.kForward);
 
         jetsonLight.set(Relay.Value.kOff);
 
