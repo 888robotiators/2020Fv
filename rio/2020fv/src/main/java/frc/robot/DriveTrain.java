@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -24,6 +25,9 @@ public class DriveTrain {
     CANPIDController frontRight_PID;
     CANPIDController rearRight_PID;
 
+    CANEncoder leftEncoder;
+    CANEncoder rightEncoder;
+
     double rightEncoderOffset;
     double leftEnccoderOffset;
 
@@ -44,13 +48,16 @@ public class DriveTrain {
         rearRight = new CANSparkMax(RobotMap.MOTOR_REAR_RIGHT,
                 CANSparkMaxLowLevel.MotorType.kBrushless);
 
+        leftEncoder = frontLeft.getEncoder();
+        rightEncoder = frontRight.getEncoder();
+
         // make rear motors follow front motors
         rearLeft.follow(frontLeft);
         rearRight.follow(frontRight);
 
         // invert right side
-        frontLeft.setInverted(true);
-        frontRight.setInverted(false);
+        frontLeft.setInverted(false);
+        frontRight.setInverted(true);
 
         // set motors to coast mode
         frontLeft.setIdleMode(IdleMode.kCoast);
@@ -68,8 +75,8 @@ public class DriveTrain {
     /**
      * Sets the speed for the left and right side of the drive train.
      * 
-     * @param leftThrust Left side output on a scale of -1.0 t0 1.0.
-     * @param rightThrust Right side output on a scale of -1.0 t0 1.0.
+     * @param leftThrust Left side output on a scale of -1.0 to 1.0.
+     * @param rightThrust Right side output on a scale of -1.0 to 1.0.
      */
     public void move(double leftThrust, double rightThrust) {
         frontLeft.set(leftThrust);
@@ -91,8 +98,8 @@ public class DriveTrain {
      * Resets the value of the encoder to zero.
      */
     public void resetEncoderOffset() {
-        leftEnccoderOffset = -frontLeft.getEncoder().getPosition();
-        rightEncoderOffset = -frontRight.getEncoder().getPosition();
+        leftEnccoderOffset = frontLeft.getEncoder().getPosition();
+        rightEncoderOffset = frontRight.getEncoder().getPosition();
     }
 
     /**

@@ -3,6 +3,8 @@ package frc.robot;
 import frc.robot.RobotMap;
 import frc.robot.DriveTrain;
 import disc.data.Position;
+import disc.data.Waypoint;
+import disc.data.WaypointMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DeadReckoning {
@@ -10,6 +12,8 @@ public class DeadReckoning {
     // Instantiates drive train object
     DriveTrain drive;
     IMU imu;
+    UDPReceiver receive;
+    WaypointMap map;
 
     Position pose;
 
@@ -44,11 +48,14 @@ public class DeadReckoning {
 
     boolean calibrated;
 
-    public DeadReckoning(DriveTrain p_drive, IMU p_imu) {
+    public DeadReckoning(DriveTrain drive, IMU imu, UDPReceiver receive, WaypointMap map) {
         // Declares the drive object to be equal to the object passed in by
         // Robot
-        drive = p_drive;
-        imu = p_imu;
+        this.drive = drive;
+        this.imu = imu;
+        this.receive = receive;
+        this.map = map;
+
         pose = new Position(0, 0, 0, 0, 0, 0);
 
         // Resets the encoder values
@@ -61,7 +68,7 @@ public class DeadReckoning {
     public void updateTracker() {
         // Calls the method to get the most recent encoder data
         updateSensorVals();
-        //updateDashboard();
+        //checkVision();
 
         // Calculates the change in the encoders and heading since the last time
         // the method was called.
@@ -159,25 +166,25 @@ public class DeadReckoning {
         changeInY = changeInDistance * Math.cos(heading);
 
         // Calculates the new position of the robot in inches.
-        clickPosX += changeInX;
-        clickPosY += changeInY;
-        posX = clickPosX / RobotMap.CLICKS_PER_INCH;
-        posY = clickPosY / RobotMap.CLICKS_PER_INCH;
+        pose.setX(pose.getX() + changeInX / RobotMap.CLICKS_PER_INCH);
+        pose.setY(pose.getY() + changeInY / RobotMap.CLICKS_PER_INCH);
+        pose.setHeading(heading);
 
         // Calculates the speed of the robot in feet per second
         speed = ((Math.sqrt(Math.pow(changeInX, 2) + Math.pow(changeInY, 2))
                 / RobotMap.CLICKS_PER_INCH) / 12) / (timePassed);
+
+        pose.setHeading(Math.toDegrees(heading));
+
     }
 
     /**
      * Refreshes dashboard values and logs values
      */
     public void updateDashboard() {
-        SmartDashboard.putNumber("X Position", posX);
-        SmartDashboard.putNumber("Y Position", posY);
-        SmartDashboard.putNumber("click x", clickPosX);
-        SmartDashboard.putNumber("click y", clickPosY);
-        SmartDashboard.putNumber("Heading", Math.toDegrees(heading));
+        SmartDashboard.putNumber("X Position", pose.getX());
+        SmartDashboard.putNumber("Y Position", pose.getY());
+        SmartDashboard.putNumber("Heading", pose.getHeading());
         SmartDashboard.putNumber("Left Encoder", encoderLeftValue);
         SmartDashboard.putNumber("Right Encoder", encoderRightValue);
         SmartDashboard.putString("Direction", direction);
@@ -213,7 +220,7 @@ public class DeadReckoning {
             lastEncoderLeft = vals[0];
             lastEncoderRight = vals[1];
             headingValue = Math
-                    .toRadians(RobotMath.modAngleDegrees(getHeading()));
+                    .toRadians(RobotMath.modAngleDegrees(heading));
             calibrated = true;
         }
 
@@ -223,6 +230,18 @@ public class DeadReckoning {
         headingValue = Math
                 .toRadians(RobotMath.modAngleDegrees(imu.getHeading()));
 
+    }
+
+    private void checkVision() {
+        if (receive.hasVision()) {
+            Waypoint visionPose = receive.getTargetPosition();
+            if (pose.compareOrthogonal(map.get("Origin"), 6)) {
+                pose.setX(0.0); //pose.getX() + map.get("AllianceTargetZone").getX() - visionPose.getX());
+                pose.setY(0.0); //pose.getY() + map.get("AllianceTargetZone").getY() - visionPose.getY());
+                SmartDashboard.putBoolean("location", true);
+            }
+            else SmartDashboard.putBoolean("location", false);
+        }
     }
 
     /**
@@ -256,16 +275,8 @@ public class DeadReckoning {
      * 
      * @return Returns a double array in format {x, y}
      */
-    public double[] getPos() {
-        return new double[] { posX, posY };
-    }
-
-    /**
-     * @return Returns the heading (in radians between 0 and 2Pi) logged by the
-     *         encoders.
-     */
-    public double getHeading() {
-        return Math.toDegrees(heading);
+    public Position getPose() {
+        return pose;
     }
 
     /**

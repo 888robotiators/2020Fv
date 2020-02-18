@@ -9,11 +9,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
 
 import disc.data.Scenario;
 import disc.data.WaypointMap;
@@ -37,7 +34,6 @@ public class Robot extends TimedRobot {
     OI oi;
     Shooter shooter;
     Turret turret;
-    ExecutorService receiveRunner = Executors.newSingleThreadExecutor();
 
     DeadReckoning location;
 
@@ -45,7 +41,7 @@ public class Robot extends TimedRobot {
     WaypointTravel guidence;
     UDPSender send;
     UDPReceiver receive;
-    WaypointMap waypoints;
+    WaypointMap map;
 
     Scenario autoScenario;
     Commander auto;
@@ -53,8 +49,23 @@ public class Robot extends TimedRobot {
     // Pneumatics
     Compressor compressor;
 
+    boolean done = false;
+    
+    int delay;
+    int counter = 0;
+
     @Override
     public void robotInit() {
+
+        try {
+            map = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
+            autoScenario = new Scenario(new File("/home/lvuser/TestAuto.txt"));
+            SmartDashboard.putBoolean("Suicide", false);
+        } 
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+            SmartDashboard.putBoolean("Suicide", true);
+        }
 
         oi = new OI();
         drive = new DriveTrain();
@@ -64,27 +75,18 @@ public class Robot extends TimedRobot {
         turret = new Turret(oi);
       
         imu = new IMU();
-        location = new DeadReckoning(drive, imu);
-        guidence = new WaypointTravel(drive, location);
         send = new UDPSender();
         receive = new UDPReceiver();
+        location = new DeadReckoning(drive, imu, receive, map);
+        guidence = new WaypointTravel(drive, location);
         nav = new Navigation(oi, drive, guidence);
 
-        shooter = new  Shooter(oi, index, receive);
+        shooter = new  Shooter(oi, location, index, turret, map);
 
         compressor = new Compressor(RobotMap.PCM);
 
-        try {
-            waypoints = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
-            autoScenario = new Scenario(new File("/home/lvuser/TestAuto.txt"));
-            SmartDashboard.putBoolean("Suicide", false);
-        } 
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-            SmartDashboard.putBoolean("Suicide", true);
-        }
+        auto = new Commander(autoScenario, map, location, guidence, intake, index, shooter);
 
-        auto = new Commander(autoScenario, waypoints, location, guidence, intake, index, shooter);
     }
 
     @Override
@@ -97,6 +99,7 @@ public class Robot extends TimedRobot {
         location.updateTracker();
         location.updateDashboard();
         auto.periodic();
+
     }
 
     @Override
@@ -108,6 +111,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        //receive.run();
         location.updateTracker();
         location.updateDashboard();
         nav.navTeleopPeriodic();
@@ -115,7 +119,6 @@ public class Robot extends TimedRobot {
         intake.intakeTeleopPeriodic();
         index.indexPeriodic();
         shooter.shooterTeleopPeriodic();
-        //receiveRunner.submit(receive);
         turret.turretTeleopPeriodic();
     }
 

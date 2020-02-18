@@ -1,5 +1,7 @@
 package frc.robot;
 
+import disc.data.Position;
+
 import disc.data.Waypoint;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -7,6 +9,8 @@ public class WaypointTravel {
 
     DriveTrain drive;
     DeadReckoning location;
+
+    Position pose;
 
     double speedAdjustment;
     double leftThrust;
@@ -36,23 +40,26 @@ public class WaypointTravel {
      */
     public boolean goToWaypoint(Waypoint destination, double speed) {
 
-        double desiredX = destination.getX();
-        double desiredY = destination.getY();
-        double desiredAngle = RobotMath.modAngleDegrees(destination.getHeading());
+        double desiredX = 48; destination.getX();
+        double desiredY = -48; destination.getY();
+        double desiredAngle = 0; RobotMath.modAngleDegrees(destination.getHeading());
+        SmartDashboard.putNumber("dtheta", desiredAngle);
+        speed = -.1;
 
         // Finds where the robot is on the field
-        double[] pos = location.getPos();
-        double heading = location.getHeading();
+        pose = location.getPose();
+
         // Initializes the arrived boolean to false
         boolean arrived = false;
 
         // Finds the difference between the current and desired headings
         double headingDifference = findDesiresdAngle(desiredX, desiredY);
 
-        if (headingDifference > 180) {
-            headingDifference -= 360;
-        }
+        // if (headingDifference > 180) {
+        //     headingDifference -= 360;
+        // }
 
+        SmartDashboard.putNumber("hd", headingDifference);
         SmartDashboard.putNumber("State", state);
 
         switch (state) {
@@ -86,7 +93,7 @@ public class WaypointTravel {
                 // If the robot is not within 4 degrees of its target heading...
                 if (Math.abs(course) > RobotMap.ANGLE_TOLERENCE) {
                     double[] rotationSpeed = turn(course, speed);
-                    drive.move(-rotationSpeed[0], -rotationSpeed[1]);
+                    drive.move(rotationSpeed[0], rotationSpeed[1]);
                 }
 
                 // Otherwise...
@@ -101,11 +108,11 @@ public class WaypointTravel {
 
                 // Travel to point
 
-                if (!((Math.abs(desiredX - pos[0]) < RobotMap.POSITION_TOLERENCE)
-                        && (Math.abs(desiredY - pos[1]) < RobotMap.POSITION_TOLERENCE))) {
+                if (!((Math.abs(desiredX - pose.getX()) < RobotMap.POSITION_TOLERENCE)
+                        && (Math.abs(desiredY - pose.getY()) < RobotMap.POSITION_TOLERENCE))) {
                     double angle = findDesiresdAngle(desiredX, desiredY);
                     double[] speeds = move(angle, speed);
-                    drive.move(-speeds[0], -speeds[1]);
+                    drive.move(-speeds[1], -speeds[0]);
 
                 }
 
@@ -122,14 +129,18 @@ public class WaypointTravel {
 
                 // If the robot is not within --- degs of its target
                 // heading...
-                if (Math.abs(RobotMath
-                        .modAngleDegrees(desiredAngle - heading)) > 2) {
+                if (Math.abs(RobotMath.modAngleDegrees(
+                        desiredAngle - pose.getHeading())) > 2) {
+                    
+                    SmartDashboard.putNumber("test", Math.abs(RobotMath
+                            .modAngleDegrees(desiredAngle - pose.getHeading())));
+
                     // ...go to that heading.
                     double[] rotationSpeed = turn(
-                            RobotMath.modAngleDegrees(desiredAngle - heading),
+                            RobotMath.modAngleDegrees(desiredAngle - pose.getHeading()),
                             speed);
 
-                    drive.move(-rotationSpeed[0], -rotationSpeed[1]);
+                    drive.move(rotationSpeed[0], rotationSpeed[1]);
 
                 }
                 // Otherwise...
@@ -164,7 +175,9 @@ public class WaypointTravel {
      * @return The speed for the left and right sides of the robot.
      */
     private double[] move(double angle, double speed) {
-        double heading = RobotMath.modAngleDegrees(location.getHeading());
+        double heading = RobotMath.modAngleDegrees(pose.getHeading());
+
+        SmartDashboard.putNumber("speed", speed);
 
         double headingDifference = angle;
         if (headingDifference > 180) {
@@ -217,10 +230,15 @@ public class WaypointTravel {
         // If the robot is going backward...
         else if (speed < 0) {
             double course = RobotMath.modAngleDegrees(heading + 180);
+            if (course > 180)
+                course -= 360;
+
+            angle -= 180;
+
+            SmartDashboard.putNumber("course", course);
 
             // If the heading is to the right of the robot's current heading...
-            if (RobotMath.modAngleDegrees(course - angle) <= RobotMath
-                    .modAngleDegrees(angle - course)) {
+            if (angle < 0) {
 
                 /*
                  * If the speed plus the adjustment for the left side would be
@@ -238,8 +256,7 @@ public class WaypointTravel {
             }
 
             // If the heading is to the right of the robot's current heading...
-            else if (RobotMath.modAngleDegrees(course - angle) > RobotMath
-                    .modAngleDegrees(angle - course)) {
+            else if (angle > 0) {
 
                 /*
                  * If the speed plus the adjustment for the right side would be
@@ -307,17 +324,13 @@ public class WaypointTravel {
      * @return Heading difference in degrees.
      */
     private double findDesiresdAngle(double desiredX, double desiredY) {
-        double heading = location.getHeading();
-
-        // Calculates the direction the robot should travel in to get to the
-        // waypoint
-        double[] pos = location.getPos();
 
         double desiredHeading = RobotMath.modAngleDegrees(Math
-                .toDegrees(Math.atan2(desiredX - pos[0], desiredY - pos[1])));
+                .toDegrees(Math.atan2(desiredX - pose.getX(), desiredY - pose.getY())));
 
         double headingDifference = RobotMath
-                .modAngleDegrees(desiredHeading - heading);
+                .modAngleDegrees(desiredHeading - pose.getHeading());
+        
         if (headingDifference > 180) {
             headingDifference -= (360);
         }

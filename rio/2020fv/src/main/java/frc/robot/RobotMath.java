@@ -1,5 +1,7 @@
 package frc.robot;
 
+import disc.data.Waypoint;
+
 public class RobotMath {
 
     public static double modAngleRadians(double angle) {
@@ -16,5 +18,9 @@ public class RobotMath {
         }
         angle %= 360;
         return angle;
+    }
+
+    public static Waypoint translatePoint(Waypoint point, Waypoint translation) {
+        return new Waypoint(point.getX() + translation.getX(), point.getY() + translation.getY());
     }
 }

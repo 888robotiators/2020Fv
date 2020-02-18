@@ -15,7 +15,7 @@ public class JetsonLight {
     }
 
     public void jetsonLightPeriodic() {
-        if(oi.getRightStickButton(16)) {
+        if(oi.getRightStickButton(12)) {
             if(jetsonLight.get().equals(Relay.Value.kOff)) {
                 jetsonLight.set(Relay.Value.kOn);
             } else {

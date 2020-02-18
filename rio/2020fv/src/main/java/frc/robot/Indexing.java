@@ -34,6 +34,8 @@ public class Indexing {
     boolean ballInPos3;
     boolean ballInPos4;
 
+    boolean loading = false;
+
     //funnel = if (B4) , dom n gert gave me this -> if((!B0 && !B1 && !B2) || intake.intakeRunning())
     //middle = if (!B0 && B1) || (!B1 && B2) || (!B2 && B3)
     //upper = if (!B0 && B1)
@@ -124,7 +126,6 @@ public class Indexing {
             runUpperBelt(0.0);
             runLoadBelt(0.0);
         }
-        
     }
 
     public void stopIndexer() {
@@ -138,10 +139,13 @@ public class Indexing {
     public boolean loadShooter() {
         if (ballInPos0) {
             runLoadBelt(1.0);
+            runUpperBelt(1.0);
+            loading = true;
             return false;
         }
-        
+        loading = false;
         runLoadBelt(0.0);
+        runUpperBelt(0.0);
         return true;
     }
 

@@ -87,8 +87,8 @@ public class Navigation {
         
 
         // Gets joystick values.
-        double leftStickValue = oi.getLeftStickAxis(RobotMap.JOYSTICK_Y_AXIS);
-        double rightStickValue = oi.getRightStickAxis(RobotMap.JOYSTICK_Y_AXIS);
+        double leftStickValue = -oi.getLeftStickAxis(RobotMap.JOYSTICK_Y_AXIS);
+        double rightStickValue = -oi.getRightStickAxis(RobotMap.JOYSTICK_Y_AXIS);
 
         SmartDashboard.putNumber("Left joystick", leftStickValue);
         SmartDashboard.putNumber("Right joystick", rightStickValue);
@@ -128,12 +128,7 @@ public class Navigation {
             rightInput = (Math.abs(rightInput) - RobotMap.JOYSTICK_DEADZONE) 
                     * (1 / (1 - RobotMap.JOYSTICK_DEADZONE)) * Math.signum(rightInput);
 
-            if (!oi.getLeftStickButton(RobotMap.JOYSTICK_TRIGGER)) {
-                leftInput *= 0.7;
-                rightInput *= 0.7;
-            }
-
-            drive.move(leftInput, rightInput);
+            drive.move(leftInput * 0.5, rightInput * 0.5);
 
         }
 

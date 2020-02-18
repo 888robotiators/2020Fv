@@ -60,7 +60,7 @@ public class Turret {
 
     }
 
-    public boolean turnTurret(double angle) {
+    public boolean setAngle(double angle) {
         return false;
     }
 

@@ -13,6 +13,7 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 
+import disc.data.Position;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class UDPReceiver implements Runnable {
@@ -30,9 +31,7 @@ public class UDPReceiver implements Runnable {
     float zValue;
     float roll;
     float pitch;
-    float yaw;
-
-    double heading;
+    float heading;
 
     public UDPReceiver() {
 
@@ -61,11 +60,11 @@ public class UDPReceiver implements Runnable {
 
             ByteBuffer bbuf = ByteBuffer.wrap(dat.getData());
             xValue = bbuf.getFloat(0);
-            yValue = bbuf.getFloat(4);
-            zValue = bbuf.getFloat(8);
+            zValue = bbuf.getFloat(4);
+            yValue = bbuf.getFloat(8);
             roll = bbuf.getFloat(12);
             pitch = bbuf.getFloat(16);
-            yaw = bbuf.getFloat(20);
+            heading = bbuf.getFloat(20);
             // heading = Math.atan2((double) XValue, (double) YValue) *
             // (180/Math.PI);
 
@@ -74,7 +73,7 @@ public class UDPReceiver implements Runnable {
             SmartDashboard.putNumber("Z Value", (double) zValue);
             SmartDashboard.putNumber("Roll", (double) roll);
             SmartDashboard.putNumber("Pitch", (double) pitch);
-            SmartDashboard.putNumber("Yaw", (double) yaw);
+            SmartDashboard.putNumber("Yaw", (double) heading);
             // SmartDashboard.putNumber("line heading", (double) heading);
             if ((int) xValue != -99 && (int) yValue != -99 && (int) zValue != -99) {
 
@@ -90,7 +89,7 @@ public class UDPReceiver implements Runnable {
         }
     }
 
-    public boolean isVision() {
+    public boolean hasVision() {
         if ((int) xValue != -99 && (int) yValue != -99 && (int) zValue != -99) {
             return true;
         }
@@ -101,7 +100,11 @@ public class UDPReceiver implements Runnable {
     
     public synchronized double[] getTarget() {
 
-        return new double[] { xValue, yValue, zValue, roll, pitch, yaw };
+        return new double[] { xValue, yValue, zValue, roll, pitch, heading };
+    }
+
+    public synchronized Position getTargetPosition() {
+        return new Position(xValue, yValue, zValue, heading, roll, pitch);
     }
     /*
     public synchronized double getTarget() {

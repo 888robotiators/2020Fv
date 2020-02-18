@@ -4,29 +4,31 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import disc.data.Position;
+import disc.data.Waypoint;
+import disc.data.WaypointMap;
+
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter {
     private OI oi;
-    private UDPReceiver recieve;
+    private DeadReckoning location;
     private Indexing index;
+    private Turret turret;
+    private WaypointMap map;
 
-    CANSparkMax shooterMotor;
-    CANPIDController pid;
-    CANEncoder encoder;
+    private CANSparkMax shooterMotor;
+    private CANPIDController pid;
+    private CANEncoder encoder;
 
+    private Waypoint target;
+    private Position pose;
 
-    protected double clicks;
-    protected double rpms;
-    protected double targetRPM;
-    protected double dist;
-    protected final double SCALAR = 13.5;
-    protected double targetDistZ = 250;
-
-    protected double speedMultiplier;
-
+    private double targetRPM;
+    private double rpms;
 
     /**
      * receive
@@ -34,14 +36,16 @@ public class Shooter {
      * @param oi
      * @param p_receiveS
      */
-    public Shooter(OI oi, Indexing indexm, UDPReceiver recieve) {
-        shooterMotor = new CANSparkMax(RobotMap.SHOOTER_CANID,
-                MotorType.kBrushless);
+    public Shooter(OI oi, DeadReckoning location, Indexing index, Turret turret, WaypointMap map) {
+        this.oi = oi;
+        this.location = location;
+        this.index = index;
+        this.turret = turret;
+        this.map = map;
+        
+        shooterMotor = new CANSparkMax(RobotMap.SHOOTER_CANID, MotorType.kBrushless);
         shooterMotor.setIdleMode(IdleMode.kCoast);
         pid = shooterMotor.getPIDController();
-        this.index = index;
-        this.oi = oi;
-        this.recieve = recieve;
 
         encoder = shooterMotor.getEncoder();
 
@@ -61,29 +65,19 @@ public class Shooter {
 
         shooterMotor.setClosedLoopRampRate(0.1);
         shooterMotor.setOpenLoopRampRate(0.1);
-
-
     }
 
     public void shooterTeleopPeriodic() {
-        // double[] targetData = receiver.getTarget();
-        // SmartDashboard.putNumber("Distance to Target", (double) targetData[2]);
-        // clicks = shooterMotor.getEncoder().getPosition();
-        // targetDistZ = targetData[2];
 
         rpms = encoder.getVelocity();
-        
+        pose = location.getPose();
+
         if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_TRIGGER)) {
-            //targetRPM = recieve.getTarget()[2] * 14;
-            shoot(targetRPM);
-            //SmartDashboard.putBoolean("working", true);
+            //shootDistance(map.get("AllianceTargetZone"));
+            setShooterOutputVelocity(targetRPM);
         }
         else {
-            shoot(0);
-            // pid.setIAccum​(0.0);
-            // talon.config_kI(0, 0, 0);
-            // talon.configClearPositionOnQuadIdx(true, 5);
-            // shoot(0);
+            stop();
         }
 
         if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_UPPER_LEFT_BUTTON))
@@ -92,34 +86,7 @@ public class Shooter {
             targetRPM-=10;
         
 
-        // if (targetRPM > rpms) {
-        //     shooterMotor.set(1.0);
-        // }
-        // else if (targetRPM < rpms && targetRPM > 0.0) {
-        //     shooterMotor.set(0.1);
-        // }
-        // else {
-        //     shooterMotor.set(0.0);
-
-        // }
-
-        // if (oi.getGamepadButton(RobotMap.X_BUTTON)){
-        //     speedMultiplier = -1;
-        //     SmartDashboard.putString("Shooter Direction", "Reverse Shoot");
-        // }
-        // else {
-        //     speedMultiplier = 1;
-        //     SmartDashboard.putString("Shooter Direction", "Forward Shoot");
-        // }
-        // if (oi.getGamepadButton(RobotMap.GP_R_BUTTON)) {
-        //     shoot(speedMultiplier);
-        // }
-        // else {
-        //     shoot(oi.getGamepadAxis(RobotMap.GP_R_TRIGGER));
-        // }
-
-        SmartDashboard.putNumber("Encoder RPMs",
-                shooterMotor.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Encoder RPMs", rpms);
         SmartDashboard.putNumber("Target RPMs", targetRPM);
         // SmartDashboard.putNumber("kP", pid.getP());
         // SmartDashboard.putNumber("kI", pid.getI());
@@ -127,12 +94,61 @@ public class Shooter {
         // SmartDashboard.putNumber("kFF", pid.getFF());
         // SmartDashboard.putNumber("DistanceAwayFromTarget", receiver.getTarget()[2]);
     }
-
-    public void shoot(double output) {
-
-        pid.setReference(output, ControlType.kVelocity);
-        if (output <= 1) {
+    
+    /**
+     * Runs the shooter at full speed.
+     */
+    public void shootFullSpeed() {
+        shooterMotor.set(1.0);
+    }
+    /**
+     * Runs the shooter at a certain percentage of full speed.
+     *
+     * @param percentSpeed A percent value between -1.0 and 1.0.
+     */
+    public void setShooterPercentSpeed(double percentSpeed) {
+        shooterMotor.set(percentSpeed);
+    }
+    /**
+     * Causes the object being shot to exit the shooter at a specified velocity.
+     *
+     * @param velocity The exit velocity in feet per second.
+     */
+    public void setShooterOutputVelocity(double velocity) {
+        pid.setReference(velocity, ControlType.kVelocity);
+        if (velocity <= 1) {
             pid.setIAccum(0);
         }
     }
+    /**
+     * The distance that the shooter should shoot the object
+     *
+     * @param position target 
+     */
+    public void shootDistance(Waypoint target) {
+        turret.setAngle(RobotMath.modAngleDegrees(Math.toDegrees(Math
+                .atan2(target.getX() - pose.getX(), target.getX() - pose.getY()))));
+
+        double distanceToTarget = Math.sqrt(Math.pow(target.getX() - pose.getX(), 2) + Math.pow(target.getX() - pose.getY(), 2));
+
+        targetRPM = distanceToTarget * 6.9;
+        
+    }
+    
+    /**
+     * Calculates the shooter's rotations per minute.
+     *
+     * @return The number of rotations of the shooter wheel in one minute.
+     */
+    public double getRPMs() {
+        return encoder.getVelocity();
+    }
+    
+    /**
+     * Stop spinning the shooter wheel.
+     */
+    public void stop() {
+        shooterMotor.set(0.0);
+    }
+
 }
