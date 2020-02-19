@@ -7,7 +7,8 @@ public class JetsonLight {
     protected OI oi;
 
     public JetsonLight(OI oi) {
-        jetsonLight = new Relay(RobotMap.JETSON_RINGLIGHT_CHANNEL, Relay.Direction.kForward);
+        jetsonLight = new Relay(RobotMap.JETSON_RINGLIGHT_CHANNEL,
+                Relay.Direction.kForward);
 
         jetsonLight.set(Relay.Value.kOff);
 
@@ -15,10 +16,11 @@ public class JetsonLight {
     }
 
     public void jetsonLightPeriodic() {
-        if(oi.getRightStickButton(12)) {
-            if(jetsonLight.get().equals(Relay.Value.kOff)) {
+        if (oi.getRightStickButton(12)) {
+            if (jetsonLight.get().equals(Relay.Value.kOff)) {
                 jetsonLight.set(Relay.Value.kOn);
-            } else {
+            }
+            else {
                 jetsonLight.set(Relay.Value.kOff);
             }
         }

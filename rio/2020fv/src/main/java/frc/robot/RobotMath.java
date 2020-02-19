@@ -20,7 +20,9 @@ public class RobotMath {
         return angle;
     }
 
-    public static Waypoint translatePoint(Waypoint point, Waypoint translation) {
-        return new Waypoint(point.getX() + translation.getX(), point.getY() + translation.getY());
+    public static Waypoint translatePoint(Waypoint point,
+            Waypoint translation) {
+        return new Waypoint(point.getX() + translation.getX(),
+                point.getY() + translation.getY());
     }
 }

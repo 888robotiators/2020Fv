@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
     Compressor compressor;
 
     boolean done = false;
-    
+
     int delay;
     int counter = 0;
 
@@ -61,7 +61,7 @@ public class Robot extends TimedRobot {
             map = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
             autoScenario = new Scenario(new File("/home/lvuser/TestAuto.txt"));
             SmartDashboard.putBoolean("Suicide", false);
-        } 
+        }
         catch (FileNotFoundException e) {
             e.printStackTrace();
             SmartDashboard.putBoolean("Suicide", true);
@@ -73,7 +73,7 @@ public class Robot extends TimedRobot {
         index = new Indexing(oi, intake);
         climb = new Climber(oi);
         turret = new Turret(oi);
-      
+
         imu = new IMU();
         send = new UDPSender();
         receive = new UDPReceiver();
@@ -81,11 +81,12 @@ public class Robot extends TimedRobot {
         guidence = new WaypointTravel(drive, location);
         nav = new Navigation(oi, drive, guidence);
 
-        shooter = new  Shooter(oi, location, index, turret, map);
+        shooter = new Shooter(oi, location, index, turret, map);
 
         compressor = new Compressor(RobotMap.PCM);
 
-        auto = new Commander(autoScenario, map, location, guidence, intake, index, shooter);
+        auto = new Commander(autoScenario, map, location, guidence, intake,
+                index, shooter);
 
     }
 
@@ -106,12 +107,12 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         compressor.setClosedLoopControl(true);
         location.reset();
-        //send.sendMessage();
+        // send.sendMessage();
     }
 
     @Override
     public void teleopPeriodic() {
-        //receive.run();
+        // receive.run();
         location.updateTracker();
         location.updateDashboard();
         nav.navTeleopPeriodic();

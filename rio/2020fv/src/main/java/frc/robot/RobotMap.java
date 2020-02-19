@@ -28,49 +28,49 @@ public class RobotMap {
     public static final int RIGHT_JOYSTICK = 1;
     public static final int GAMEPAD_PORT = 2;
 
-     // Button ID values on the Joystick
-     public static final int JOYSTICK_TRIGGER = 1;
-     public static final int JOYSTICK_BOTTOM_BUTTON = 2;
-     public static final int JOYSTICK_CENTER_BUTTON = 3;
-     public static final int JOYSTICK_LEFT_BUTTON = 4;
-     public static final int JOYSTICK_RIGHT_BUTTON = 5;
-     
-     // Axes values for Joysticks
-     public static final int JOYSTICK_X_AXIS = 0;
-     public static final int JOYSTICK_Y_AXIS = 1;
-     public static final int JOYSTICK_SLIDER_AXIS = 2;
+    // Button ID values on the Joystick
+    public static final int JOYSTICK_TRIGGER = 1;
+    public static final int JOYSTICK_BOTTOM_BUTTON = 2;
+    public static final int JOYSTICK_CENTER_BUTTON = 3;
+    public static final int JOYSTICK_LEFT_BUTTON = 4;
+    public static final int JOYSTICK_RIGHT_BUTTON = 5;
 
-     // Button ID values on the 3D Joystick
-     public static final int JOYSTICK_3D_TRIGGER = 1;
-     public static final int JOYSTICK_3D_THUMB_BUTTON = 2;
-     public static final int JOYSTICK_3D_LOWER_LEFT_BUTTON = 3;
-     public static final int JOYSTICK_3D_LOWER_RIGHT_BUTTON = 4;
-     public static final int JOYSTICK_3D_UPPER_LEFT_BUTTON = 5;
-     public static final int JOYSTICK_3D_UPPER_RIGHT_BUTTON = 6;
+    // Axes values for Joysticks
+    public static final int JOYSTICK_X_AXIS = 0;
+    public static final int JOYSTICK_Y_AXIS = 1;
+    public static final int JOYSTICK_SLIDER_AXIS = 2;
+
+    // Button ID values on the 3D Joystick
+    public static final int JOYSTICK_3D_TRIGGER = 1;
+    public static final int JOYSTICK_3D_THUMB_BUTTON = 2;
+    public static final int JOYSTICK_3D_LOWER_LEFT_BUTTON = 3;
+    public static final int JOYSTICK_3D_LOWER_RIGHT_BUTTON = 4;
+    public static final int JOYSTICK_3D_UPPER_LEFT_BUTTON = 5;
+    public static final int JOYSTICK_3D_UPPER_RIGHT_BUTTON = 6;
 
     // Axes values for Joysticks
     public static final int JOYSTICK_3D_X_AXIS = 0;
     public static final int JOYSTICK_3D_Y_AXIS = 1;
     public static final int JOYSTICK_3D_Z_AXIS = 2;
     public static final int JOYSTICK_3D_SLIDER_AXIS = 3;
- 
-     // Button values for gamepad
-     public static final int A_BUTTON = 1;
-     public static final int B_BUTTON = 2;
-     public static final int X_BUTTON = 3;
-     public static final int Y_BUTTON = 4;
-     public static final int GP_L_BUTTON = 5;
-     public static final int GP_R_BUTTON = 6;
- 
-     // Axes values for gamepad
-     public static final int GP_L_X_AXIS = 0;
-     public static final int GP_L_Y_AXIS = 1;
- 
-     public static final int GP_L_TRIGGER = 2;
-     public static final int GP_R_TRIGGER = 3;
- 
-     public static final int GP_R_X_AXIS = 4;
-     public static final int GP_R_Y_AXIS = 5;
+
+    // Button values for gamepad
+    public static final int A_BUTTON = 1;
+    public static final int B_BUTTON = 2;
+    public static final int X_BUTTON = 3;
+    public static final int Y_BUTTON = 4;
+    public static final int GP_L_BUTTON = 5;
+    public static final int GP_R_BUTTON = 6;
+
+    // Axes values for gamepad
+    public static final int GP_L_X_AXIS = 0;
+    public static final int GP_L_Y_AXIS = 1;
+
+    public static final int GP_L_TRIGGER = 2;
+    public static final int GP_R_TRIGGER = 3;
+
+    public static final int GP_R_X_AXIS = 4;
+    public static final int GP_R_Y_AXIS = 5;
 
     // IDs for pneumatic controls
     public static final int PCM = 5;
@@ -96,7 +96,5 @@ public class RobotMap {
     public static final int BALL_POS_4_CHANNEL = 4;
 
     public static final int TURRET_ENCODER_CHANNEL = 9;
-    
-
 
 }

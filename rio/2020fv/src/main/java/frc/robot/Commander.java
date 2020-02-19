@@ -10,24 +10,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Commander {
 
     private Scenario scenario;
-    private  WaypointMap waypoints;
+    private WaypointMap waypoints;
 
     private Instruction current;
     private String[] currentArgs;
     private Queue<Instruction> queue;
 
     private WaypointTravel guidance;
-    //private DeadReckoning location;
+    // private DeadReckoning location;
     private Intake intake;
-    //private Indexing index;
-    //private Shooter shooter;
+    // private Indexing index;
+    // private Shooter shooter;
 
     private int counter = 0;
 
     private boolean isDone = true;
 
-    Commander(Scenario scenario, WaypointMap waypoints, DeadReckoning location, 
-            WaypointTravel guidance, Intake intake, Indexing index, Shooter shooter) {
+    Commander(Scenario scenario, WaypointMap waypoints, DeadReckoning location,
+            WaypointTravel guidance, Intake intake, Indexing index,
+            Shooter shooter) {
         this.scenario = scenario;
         this.waypoints = waypoints;
 
@@ -57,65 +58,67 @@ public class Commander {
 
             switch (current.getT()) {
 
-            case DELIMITER:
+                case DELIMITER:
 
-                if (currentArgs[0].equalsIgnoreCase("start")) {
-                    // start up code for scenario
-                }
+                    if (currentArgs[0].equalsIgnoreCase("start")) {
+                        // start up code for scenario
+                    }
 
-                if (currentArgs[0].equalsIgnoreCase("stop")) {
-                    // stop code for scenario
-                }
-
-                break;
-
-            case COMMAND:
-
-                switch (current.getTarget()) {
-                case "nav":
-
-                    if (currentArgs[0].equalsIgnoreCase("goTo")) {
-                        if (guidance.goToWaypoint(waypoints.get(currentArgs[1]), Double.parseDouble(currentArgs[2]))) {
-                            isDone = true;
-                        }
+                    if (currentArgs[0].equalsIgnoreCase("stop")) {
+                        // stop code for scenario
                     }
 
                     break;
 
-                case "shooter":
+                case COMMAND:
+
+                    switch (current.getTarget()) {
+                        case "nav":
+
+                            if (currentArgs[0].equalsIgnoreCase("goTo")) {
+                                if (guidance.goToWaypoint(
+                                        waypoints.get(currentArgs[1]),
+                                        Double.parseDouble(currentArgs[2]))) {
+                                    isDone = true;
+                                }
+                            }
+
+                            break;
+
+                        case "shooter":
+                            break;
+                        case "intake":
+                            if (currentArgs[0].equalsIgnoreCase("intakeDown")) {
+                                intake.flipDown();
+                                isDone = true;
+                            }
+                            if (currentArgs[0].equalsIgnoreCase("intakeUp")) {
+                                intake.flipUp();
+                                isDone = true;
+                            }
+                            if (currentArgs[0].equalsIgnoreCase("intakeRun")) {
+                                intake.intakeIn();
+                                isDone = true;
+                            }
+                            if (currentArgs[0].equalsIgnoreCase("intakeRun")) {
+                                intake.intakeIn();
+                                isDone = true;
+                            }
+                            if (currentArgs[0].equalsIgnoreCase("intakeStop")) {
+                                intake.intakeStop();
+                                isDone = true;
+                            }
+                            break;
+                        default:
+                            isDone = true;
+                            break;
+                    }
+
                     break;
-                case "intake":
-                        if (currentArgs[0].equalsIgnoreCase("intakeDown")) {
-                            intake.flipDown();
-                            isDone = true;
-                        }
-                        if (currentArgs[0].equalsIgnoreCase("intakeUp")) {
-                            intake.flipUp();
-                            isDone = true;
-                        }
-                        if (currentArgs[0].equalsIgnoreCase("intakeRun")) {
-                            intake.intakeIn();
-                            isDone = true;
-                        }
-                        if (currentArgs[0].equalsIgnoreCase("intakeRun")) {
-                            intake.intakeIn();
-                            isDone = true;
-                        }
-                        if (currentArgs[0].equalsIgnoreCase("intakeStop")) {
-                            intake.intakeStop();
-                            isDone = true;
-                        }
-                    break;
-                default:
+
+                case CONTROL_STATE:
                     isDone = true;
                     break;
-                }
-
-                break;
-
-            case CONTROL_STATE:
-                isDone = true;
-                break;
             }
 
         }

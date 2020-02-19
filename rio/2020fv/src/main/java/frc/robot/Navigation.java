@@ -19,7 +19,6 @@ public class Navigation {
     DriveTrain drive;
     WaypointTravel guidance;
 
-
     Servo servo;
 
     double[] targetData;
@@ -45,12 +44,14 @@ public class Navigation {
      * @param p_guidance Global {@link WaypointTravel} object
      * @param p_receive Global {@link UDPReceiver} object
      */
-    public Navigation(OI oi, DriveTrain drive, WaypointTravel guidance) { //           UDPReceiver p_receive) {
+    public Navigation(OI oi, DriveTrain drive, WaypointTravel guidance) { // UDPReceiver
+                                                                          // p_receive)
+                                                                          // {
 
         this.oi = oi;
         this.drive = drive;
         this.guidance = guidance;
-        //receive = p_receive;
+        // receive = p_receive;
 
         servo = new Servo(0);
         // destination = waypoints.get("TwoFootTestPoint");
@@ -70,25 +71,24 @@ public class Navigation {
      */
     public void manualDrive() {
 
-        
         // brake = (brakeButton && !brakeButtonLast) ? !brake : brake;
         // brakeButtonLast = brakeButton;
         // brakeButton = oi.getLeftStickButton(RobotMap.JOYSTICK_LEFT_BUTTON) ||
-        //     oi.getRightStickButton(RobotMap.JOYSTICK_RIGHT_BUTTON);
-            
+        // oi.getRightStickButton(RobotMap.JOYSTICK_RIGHT_BUTTON);
+
         // if (brake) {
-        //     drive.brake();
-        // }   
-        // else { 
-        //     drive.coast();
+        // drive.brake();
         // }
-        
+        // else {
+        // drive.coast();
+        // }
+
         // SmartDashboard.putBoolean("mode", brake);
-        
 
         // Gets joystick values.
         double leftStickValue = -oi.getLeftStickAxis(RobotMap.JOYSTICK_Y_AXIS);
-        double rightStickValue = -oi.getRightStickAxis(RobotMap.JOYSTICK_Y_AXIS);
+        double rightStickValue = -oi
+                .getRightStickAxis(RobotMap.JOYSTICK_Y_AXIS);
 
         SmartDashboard.putNumber("Left joystick", leftStickValue);
         SmartDashboard.putNumber("Right joystick", rightStickValue);
@@ -117,16 +117,20 @@ public class Navigation {
         double rightInput = reverse ? -leftStickValue : rightStickValue;
 
         // Sends values to drive train.
-        if (Math.abs(leftStickValue) > RobotMap.JOYSTICK_DEADZONE || 
-                Math.abs(rightStickValue) > RobotMap.JOYSTICK_DEADZONE) {
+        if (Math.abs(leftStickValue) > RobotMap.JOYSTICK_DEADZONE
+                || Math.abs(rightStickValue) > RobotMap.JOYSTICK_DEADZONE) {
 
-            leftInput = (Math.abs(leftInput) < RobotMap.JOYSTICK_DEADZONE) ? 0.0 : leftInput;
-            rightInput = (Math.abs(rightInput) < RobotMap.JOYSTICK_DEADZONE) ? 0.0 : rightInput;
+            leftInput = (Math.abs(leftInput) < RobotMap.JOYSTICK_DEADZONE) ? 0.0
+                    : leftInput;
+            rightInput = (Math.abs(rightInput) < RobotMap.JOYSTICK_DEADZONE)
+                    ? 0.0 : rightInput;
 
-            leftInput = (Math.abs(leftInput) - RobotMap.JOYSTICK_DEADZONE) 
-                    * (1 / (1 - RobotMap.JOYSTICK_DEADZONE)) * Math.signum(leftInput);
-            rightInput = (Math.abs(rightInput) - RobotMap.JOYSTICK_DEADZONE) 
-                    * (1 / (1 - RobotMap.JOYSTICK_DEADZONE)) * Math.signum(rightInput);
+            leftInput = (Math.abs(leftInput) - RobotMap.JOYSTICK_DEADZONE)
+                    * (1 / (1 - RobotMap.JOYSTICK_DEADZONE))
+                    * Math.signum(leftInput);
+            rightInput = (Math.abs(rightInput) - RobotMap.JOYSTICK_DEADZONE)
+                    * (1 / (1 - RobotMap.JOYSTICK_DEADZONE))
+                    * Math.signum(rightInput);
 
             drive.move(leftInput * 0.5, rightInput * 0.5);
 

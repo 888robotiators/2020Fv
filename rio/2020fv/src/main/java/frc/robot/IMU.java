@@ -1,6 +1,5 @@
 package frc.robot;
 
-
 import edu.wpi.first.wpilibj.SPI;
 
 import com.kauailabs.navx.frc.AHRS;

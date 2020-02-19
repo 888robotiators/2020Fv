@@ -36,14 +36,16 @@ public class Shooter {
      * @param oi
      * @param p_receiveS
      */
-    public Shooter(OI oi, DeadReckoning location, Indexing index, Turret turret, WaypointMap map) {
+    public Shooter(OI oi, DeadReckoning location, Indexing index, Turret turret,
+            WaypointMap map) {
         this.oi = oi;
         this.location = location;
         this.index = index;
         this.turret = turret;
         this.map = map;
-        
-        shooterMotor = new CANSparkMax(RobotMap.SHOOTER_CANID, MotorType.kBrushless);
+
+        shooterMotor = new CANSparkMax(RobotMap.SHOOTER_CANID,
+                MotorType.kBrushless);
         shooterMotor.setIdleMode(IdleMode.kCoast);
         pid = shooterMotor.getPIDController();
 
@@ -73,7 +75,7 @@ public class Shooter {
         pose = location.getPose();
 
         if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_TRIGGER)) {
-            //shootDistance(map.get("AllianceTargetZone"));
+            // shootDistance(map.get("AllianceTargetZone"));
             setShooterOutputVelocity(targetRPM);
         }
         else {
@@ -81,10 +83,9 @@ public class Shooter {
         }
 
         if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_UPPER_LEFT_BUTTON))
-            targetRPM+=10;
+            targetRPM += 10;
         if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_LOWER_LEFT_BUTTON))
-            targetRPM-=10;
-        
+            targetRPM -= 10;
 
         SmartDashboard.putNumber("Encoder RPMs", rpms);
         SmartDashboard.putNumber("Target RPMs", targetRPM);
@@ -92,15 +93,17 @@ public class Shooter {
         // SmartDashboard.putNumber("kI", pid.getI());
         // SmartDashboard.putNumber("kD", pid.getD());
         // SmartDashboard.putNumber("kFF", pid.getFF());
-        // SmartDashboard.putNumber("DistanceAwayFromTarget", receiver.getTarget()[2]);
+        // SmartDashboard.putNumber("DistanceAwayFromTarget",
+        // receiver.getTarget()[2]);
     }
-    
+
     /**
      * Runs the shooter at full speed.
      */
     public void shootFullSpeed() {
         shooterMotor.set(1.0);
     }
+
     /**
      * Runs the shooter at a certain percentage of full speed.
      *
@@ -109,6 +112,7 @@ public class Shooter {
     public void setShooterPercentSpeed(double percentSpeed) {
         shooterMotor.set(percentSpeed);
     }
+
     /**
      * Causes the object being shot to exit the shooter at a specified velocity.
      *
@@ -120,21 +124,24 @@ public class Shooter {
             pid.setIAccum(0);
         }
     }
+
     /**
      * The distance that the shooter should shoot the object
      *
-     * @param position target 
+     * @param position target
      */
     public void shootDistance(Waypoint target) {
-        turret.setAngle(RobotMath.modAngleDegrees(Math.toDegrees(Math
-                .atan2(target.getX() - pose.getX(), target.getX() - pose.getY()))));
+        turret.setAngle(RobotMath.modAngleDegrees(Math.toDegrees(Math.atan2(
+                target.getX() - pose.getX(), target.getX() - pose.getY()))));
 
-        double distanceToTarget = Math.sqrt(Math.pow(target.getX() - pose.getX(), 2) + Math.pow(target.getX() - pose.getY(), 2));
+        double distanceToTarget = Math
+                .sqrt(Math.pow(target.getX() - pose.getX(), 2)
+                        + Math.pow(target.getX() - pose.getY(), 2));
 
         targetRPM = distanceToTarget * 6.9;
-        
+
     }
-    
+
     /**
      * Calculates the shooter's rotations per minute.
      *
@@ -143,7 +150,7 @@ public class Shooter {
     public double getRPMs() {
         return encoder.getVelocity();
     }
-    
+
     /**
      * Stop spinning the shooter wheel.
      */

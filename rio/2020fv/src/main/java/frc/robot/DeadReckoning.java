@@ -48,7 +48,8 @@ public class DeadReckoning {
 
     boolean calibrated;
 
-    public DeadReckoning(DriveTrain drive, IMU imu, UDPReceiver receive, WaypointMap map) {
+    public DeadReckoning(DriveTrain drive, IMU imu, UDPReceiver receive,
+            WaypointMap map) {
         // Declares the drive object to be equal to the object passed in by
         // Robot
         this.drive = drive;
@@ -68,7 +69,7 @@ public class DeadReckoning {
     public void updateTracker() {
         // Calls the method to get the most recent encoder data
         updateSensorVals();
-        //checkVision();
+        // checkVision();
 
         // Calculates the change in the encoders and heading since the last time
         // the method was called.
@@ -145,7 +146,6 @@ public class DeadReckoning {
                         / Math.sin((Math.PI - changeInHeading) / 2);
             }
 
-
             else {
 
                 changeInDistance = -Math.sin(changeInHeading)
@@ -154,7 +154,7 @@ public class DeadReckoning {
             }
 
             direction = "SCCW";
-            
+
         }
 
         // Calculate the angle of change for the bot and the change in heading.
@@ -219,8 +219,7 @@ public class DeadReckoning {
             // ...so set the last value to be equal to the current value...
             lastEncoderLeft = vals[0];
             lastEncoderRight = vals[1];
-            headingValue = Math
-                    .toRadians(RobotMath.modAngleDegrees(heading));
+            headingValue = Math.toRadians(RobotMath.modAngleDegrees(heading));
             calibrated = true;
         }
 
@@ -236,8 +235,12 @@ public class DeadReckoning {
         if (receive.hasVision()) {
             Waypoint visionPose = receive.getTargetPosition();
             if (pose.compareOrthogonal(map.get("Origin"), 6)) {
-                pose.setX(0.0); //pose.getX() + map.get("AllianceTargetZone").getX() - visionPose.getX());
-                pose.setY(0.0); //pose.getY() + map.get("AllianceTargetZone").getY() - visionPose.getY());
+                pose.setX(0.0); // pose.getX() +
+                                // map.get("AllianceTargetZone").getX() -
+                                // visionPose.getX());
+                pose.setY(0.0); // pose.getY() +
+                                // map.get("AllianceTargetZone").getY() -
+                                // visionPose.getY());
                 SmartDashboard.putBoolean("location", true);
             }
             else SmartDashboard.putBoolean("location", false);

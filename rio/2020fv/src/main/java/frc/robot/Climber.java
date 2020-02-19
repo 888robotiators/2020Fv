@@ -7,29 +7,32 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public class Climber {
     private OI oi;
-    
+
     private TalonSRX climberMotor;
     private DoubleSolenoid lock;
 
     public Climber(OI oi) {
         this.oi = oi;
-        
+
         climberMotor = new TalonSRX(20);
-        //followerTalon = new TalonSRX(21);
+        // followerTalon = new TalonSRX(21);
 
         climberMotor.setInverted(true);
-    
+
         lock = new DoubleSolenoid(RobotMap.PCM, 2, 3);
 
-        //followerTalon.follow(climberController);
+        // followerTalon.follow(climberController);
 
     }
 
     public void climberTeleopPeriodic() {
-        if (oi.getGamepadAxis(RobotMap.GP_R_TRIGGER) > 0.1){
-            climberMotor.set(ControlMode.PercentOutput, -oi.getGamepadAxis(RobotMap.GP_R_TRIGGER));
-        } else if (oi.getGamepadAxis(RobotMap.GP_L_TRIGGER) > 0.1){
-            climberMotor.set(ControlMode.PercentOutput, oi.getGamepadAxis(RobotMap.GP_L_TRIGGER));
+        if (oi.getGamepadAxis(RobotMap.GP_R_TRIGGER) > 0.1) {
+            climberMotor.set(ControlMode.PercentOutput,
+                    -oi.getGamepadAxis(RobotMap.GP_R_TRIGGER));
+        }
+        else if (oi.getGamepadAxis(RobotMap.GP_L_TRIGGER) > 0.1) {
+            climberMotor.set(ControlMode.PercentOutput,
+                    oi.getGamepadAxis(RobotMap.GP_L_TRIGGER));
         }
         else {
             climberMotor.set(ControlMode.PercentOutput, 0);

@@ -10,10 +10,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Indexing {
-    
+
     OI oi;
     Intake intake;
-    
+
     TalonSRX funnelMotor;
     TalonSRX lowerFunnelSideIndex;
     TalonSRX lowerFarSideIndex;
@@ -36,9 +36,10 @@ public class Indexing {
 
     boolean loading = false;
 
-    //funnel = if (B4) , dom n gert gave me this -> if((!B0 && !B1 && !B2) || intake.intakeRunning())
-    //middle = if (!B0 && B1) || (!B1 && B2) || (!B2 && B3)
-    //upper = if (!B0 && B1)
+    // funnel = if (B4) , dom n gert gave me this -> if((!B0 && !B1 && !B2) ||
+    // intake.intakeRunning())
+    // middle = if (!B0 && B1) || (!B1 && B2) || (!B2 && B3)
+    // upper = if (!B0 && B1)
 
     public Indexing(OI oi, Intake intake) {
 
@@ -48,17 +49,17 @@ public class Indexing {
         funnelMotor = new TalonSRX(RobotMap.FUNNEL_MOTOR_CANID);
         lowerFunnelSideIndex = new TalonSRX(
                 RobotMap.LOWER_FUNNEL_SIDE_INDEX_CANID);
-        lowerFarSideIndex = new TalonSRX(
-                RobotMap.LOWER_FAR_SIDE_INDEX_CANID);
-        
-        upperBeltIndex = new CANSparkMax(RobotMap.UPPER_BELT_CANID, MotorType.kBrushless);
-        loadingBeltIndex = new CANSparkMax(RobotMap.LOADING_BELT_CANID, MotorType.kBrushless);
+        lowerFarSideIndex = new TalonSRX(RobotMap.LOWER_FAR_SIDE_INDEX_CANID);
+
+        upperBeltIndex = new CANSparkMax(RobotMap.UPPER_BELT_CANID,
+                MotorType.kBrushless);
+        loadingBeltIndex = new CANSparkMax(RobotMap.LOADING_BELT_CANID,
+                MotorType.kBrushless);
 
         funnelMotor.setInverted(true);
 
         upperBeltIndex.setInverted(true);
         loadingBeltIndex.setInverted(true);
-
 
         bannerPos0 = new DigitalInput(0);
         bannerPos1 = new DigitalInput(1);
@@ -70,8 +71,8 @@ public class Indexing {
     public void indexPeriodic() {
         updateBallPoitions();
 
-        if(oi.getGamepadPOV() != -1) {
-            
+        if (oi.getGamepadPOV() != -1) {
+
             if (oi.getGamepadPOV() == 0) {
                 runFunnel(.5);
                 runLowerFunnelSideIndex(.5);
@@ -89,10 +90,10 @@ public class Indexing {
             }
 
         }
-        
+
         else {
-            
-            //stopIndexer();
+
+            // stopIndexer();
             bringToTop();
 
         }
@@ -109,7 +110,8 @@ public class Indexing {
             runFunnel(0.0);
         }
 
-        if ((!banners[0] && banners[1]) || (!banners[1] && banners[2]) || (!banners[2] && banners[3])) {
+        if ((!banners[0] && banners[1]) || (!banners[1] && banners[2])
+                || (!banners[2] && banners[3])) {
             runLowerFarSideIndex(0.5);
             runLowerFunnelSideIndex(0.5);
         }
@@ -150,7 +152,8 @@ public class Indexing {
     }
 
     public boolean hasBalls() {
-        return ballInPos0 || ballInPos1 || ballInPos2 || ballInPos3 || ballInPos4;
+        return ballInPos0 || ballInPos1 || ballInPos2 || ballInPos3
+                || ballInPos4;
     }
 
     public boolean readyToFire() {
@@ -158,33 +161,23 @@ public class Indexing {
     }
 
     public int getNextBall() {
-        if (ballInPos0)
-            return 0;
-        if (ballInPos1)
-            return 1;
-        if (ballInPos2)
-            return 2;
-        if (ballInPos3)
-            return 3;
-        if (ballInPos4)
-            return 4;
+        if (ballInPos0) return 0;
+        if (ballInPos1) return 1;
+        if (ballInPos2) return 2;
+        if (ballInPos3) return 3;
+        if (ballInPos4) return 4;
         return -1;
     }
 
     public int getNumBalls() {
         int ballsInRobot = 0;
 
-        if (ballInPos0)
-            ballsInRobot++;
-        if (ballInPos1)
-            ballsInRobot++;
-        if (ballInPos2)
-            ballsInRobot++;
-        if (ballInPos3)
-            ballsInRobot++;
-        if (ballInPos4)
-            ballsInRobot++;
-            
+        if (ballInPos0) ballsInRobot++;
+        if (ballInPos1) ballsInRobot++;
+        if (ballInPos2) ballsInRobot++;
+        if (ballInPos3) ballsInRobot++;
+        if (ballInPos4) ballsInRobot++;
+
         return ballsInRobot;
     }
 
@@ -201,7 +194,8 @@ public class Indexing {
         SmartDashboard.putBoolean("ball 3", ballInPos3);
         SmartDashboard.putBoolean("ball 4", ballInPos4);
 
-        return new boolean[] {ballInPos0, ballInPos1, ballInPos2, ballInPos3, ballInPos4};
+        return new boolean[] { ballInPos0, ballInPos1, ballInPos2, ballInPos3,
+                ballInPos4 };
     }
 
     private void runFunnel(double speed) {

@@ -18,8 +18,8 @@ public class Intake {
     private boolean isRunning = false;
 
     public Intake(OI oi) {
-        intakeFlipper = new DoubleSolenoid(RobotMap.PCM, RobotMap.DS_FORWARD_CHANNEL,
-                RobotMap.DS_REVERSE_CHANNEL);
+        intakeFlipper = new DoubleSolenoid(RobotMap.PCM,
+                RobotMap.DS_FORWARD_CHANNEL, RobotMap.DS_REVERSE_CHANNEL);
         intakeMotor = new TalonSRX(RobotMap.INTAKE_CANID);
 
         intakeMotor.setInverted(true);
@@ -50,11 +50,11 @@ public class Intake {
 
     public void flipIntake(boolean flip) {
         if (flip) {
-            
+
             if (intakeFlipper.get().equals(DoubleSolenoid.Value.kReverse)) {
                 intakeFlipper.set(DoubleSolenoid.Value.kForward);
-            }            
-            
+            }
+
             else {
                 intakeFlipper.set(DoubleSolenoid.Value.kReverse);
             }
@@ -78,12 +78,12 @@ public class Intake {
 
     public void flipDown() {
         if (intakeFlipper.get().equals(DoubleSolenoid.Value.kReverse))
-                intakeFlipper.set(DoubleSolenoid.Value.kForward);
+            intakeFlipper.set(DoubleSolenoid.Value.kForward);
     }
 
     public void flipUp() {
         if (intakeFlipper.get().equals(DoubleSolenoid.Value.kForward))
-                intakeFlipper.set(DoubleSolenoid.Value.kReverse);
+            intakeFlipper.set(DoubleSolenoid.Value.kReverse);
     }
 
     public boolean isRunning() {

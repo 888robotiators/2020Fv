@@ -5,7 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-
 package frc.robot;
 
 import java.net.DatagramPacket;
@@ -48,7 +47,6 @@ public class UDPReceiver implements Runnable {
         }
     }
 
-
     @Override
     public void run() {
         receiveMessage();
@@ -75,7 +73,8 @@ public class UDPReceiver implements Runnable {
             SmartDashboard.putNumber("Pitch", (double) pitch);
             SmartDashboard.putNumber("Yaw", (double) heading);
             // SmartDashboard.putNumber("line heading", (double) heading);
-            if ((int) xValue != -99 && (int) yValue != -99 && (int) zValue != -99) {
+            if ((int) xValue != -99 && (int) yValue != -99
+                    && (int) zValue != -99) {
 
                 SmartDashboard.putBoolean("vision", true);
             }
@@ -97,7 +96,7 @@ public class UDPReceiver implements Runnable {
             return false;
         }
     }
-    
+
     public synchronized double[] getTarget() {
 
         return new double[] { xValue, yValue, zValue, roll, pitch, heading };
@@ -107,9 +106,6 @@ public class UDPReceiver implements Runnable {
         return new Position(xValue, yValue, zValue, heading, roll, pitch);
     }
     /*
-    public synchronized double getTarget() {
-        return zValue;
-        
-    }
-    */
+     * public synchronized double getTarget() { return zValue; }
+     */
 }
