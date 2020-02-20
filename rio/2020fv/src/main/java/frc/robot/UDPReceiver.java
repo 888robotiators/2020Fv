@@ -39,7 +39,7 @@ public class UDPReceiver extends Thread {
         try {
             // open a datagram socket to receive messages
             // should be a different port than the sender
-            socket = new DatagramSocket(RobotMap.JETSON_SOCKET);
+            socket = new DatagramSocket(RobotMap.RECEIVER_SOCKET);
 
             // create a datagram packet to receive data of a certain length
             dat = new DatagramPacket(receiveData, receiveData.length);

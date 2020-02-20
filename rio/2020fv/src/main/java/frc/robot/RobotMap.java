@@ -73,7 +73,7 @@ public class RobotMap {
     public static final int PCM = 5;
     public static final int SOLENOID = 1;
 
-    public static final int RECEIVER_SOCKET = 5806;
+    public static final int RECEIVER_SOCKET = 5555;
 
     public static final double JOYSTICK_DEADZONE = 0.2;
     public static final double RAMP_RATE = 0.2;
