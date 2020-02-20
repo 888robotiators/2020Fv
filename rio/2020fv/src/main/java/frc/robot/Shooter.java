@@ -158,4 +158,18 @@ public class Shooter {
         shooterMotor.set(0.0);
     }
 
+    /**
+     * Determines if shooter is ready to fire ball
+     * 
+     * @return True if system is ready to fire a ball
+     */
+    public boolean readyToFire() {
+        if(Math.abs(targetRPM - getRPMs()) < RobotMap.SHOOTER_RPM_TOLERANCE) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }
