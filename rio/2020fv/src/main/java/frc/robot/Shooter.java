@@ -119,6 +119,7 @@ public class Shooter {
      * @param velocity The exit velocity in feet per second.
      */
     public void setShooterOutputVelocity(double velocity) {
+        targetRPM = velocity;
         pid.setReference(velocity, ControlType.kVelocity);
         if (velocity <= 1) {
             pid.setIAccum(0);

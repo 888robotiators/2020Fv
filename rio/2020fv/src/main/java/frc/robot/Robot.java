@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 import java.io.File;
@@ -43,6 +45,9 @@ public class Robot extends TimedRobot {
     UDPReceiver receive;
     WaypointMap map;
 
+    UsbCamera camera0;
+    UsbCamera camera1;
+
     Scenario autoScenario;
     Commander auto;
 
@@ -59,7 +64,7 @@ public class Robot extends TimedRobot {
 
         try {
             map = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
-            autoScenario = new Scenario(new File("/home/lvuser/TestAuto.txt"));
+            autoScenario = new Scenario(new File("/home/lvuser/AutoPlay5.txt"));
             SmartDashboard.putBoolean("Suicide", false);
         }
         catch (FileNotFoundException e) {
@@ -81,6 +86,9 @@ public class Robot extends TimedRobot {
         guidence = new WaypointTravel(drive, location);
         nav = new Navigation(oi, drive, guidence);
 
+        camera0 = CameraServer.getInstance().startAutomaticCapture(0);
+        camera1 = CameraServer.getInstance().startAutomaticCapture(1);
+
         shooter = new Shooter(oi, location, index, turret, map);
 
         compressor = new Compressor(RobotMap.PCM);
@@ -99,6 +107,7 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() {
         location.updateTracker();
         location.updateDashboard();
+        index.updateBallPoitions();
         auto.periodic();
 
     }

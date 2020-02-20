@@ -17,12 +17,12 @@ public class Commander {
     private Queue<Instruction> queue;
 
     private WaypointTravel guidance;
-    // private DeadReckoning location;
     private Intake intake;
-    // private Indexing index;
-    // private Shooter shooter;
+    private Indexing index;
+    private Shooter shooter;
 
     private int counter = 0;
+    private int instructionCounter = 0;
 
     private boolean isDone = true;
 
@@ -36,6 +36,9 @@ public class Commander {
         current = null;
 
         this.guidance = guidance;
+        this.intake = intake;
+        this.index = index;
+        this.shooter = shooter;
     }
 
     public void periodic() {
@@ -43,14 +46,14 @@ public class Commander {
             isDone = false;
             if (!queue.isEmpty()) {
                 current = queue.remove();
-                counter++;
+                instructionCounter++;
             }
             else {
                 current = null;
             }
         }
 
-        SmartDashboard.putNumber("instruction", counter);
+        SmartDashboard.putNumber("instruction", instructionCounter);
 
         if (current != null) {
 
@@ -86,6 +89,18 @@ public class Commander {
                             break;
 
                         case "shooter":
+                            if (currentArgs[0].equalsIgnoreCase("shoot")) {
+                                if (index.hasBalls()) {
+                                    index.bringToTop();
+                                    shooter.setShooterOutputVelocity(Integer.parseInt(currentArgs[1]));
+                                    if (shooter.readyToFire()) {
+                                        index.loadShooter();
+                                    }
+                                }
+                                else {
+                                    isDone = true;
+                                }
+                            }
                             break;
                         case "intake":
                             if (currentArgs[0].equalsIgnoreCase("intakeDown")) {
@@ -108,6 +123,18 @@ public class Commander {
                                 intake.intakeStop();
                                 isDone = true;
                             }
+                            break;
+                        case "command":
+                            if (currentArgs[0].equalsIgnoreCase("wait")) {
+                                if (counter < Integer.parseInt(currentArgs[1]) * 50) {
+                                    counter++;
+                                }
+                                else {
+                                    counter = 0;
+                                    isDone = true;
+                                }
+                            }
+    
                             break;
                         default:
                             isDone = true;

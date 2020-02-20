@@ -181,7 +181,7 @@ public class Indexing {
         return ballsInRobot;
     }
 
-    private boolean[] updateBallPoitions() {
+    public boolean[] updateBallPoitions() {
         ballInPos0 = bannerPos0.get();
         ballInPos1 = bannerPos1.get();
         ballInPos2 = bannerPos2.get();
