@@ -88,15 +88,42 @@ public class Indexing {
                 runUpperBelt(-0.5);
                 runLoadBelt(-0.50);
             }
-
+            else if (oi.getGamepadButton(RobotMap.Y_BUTTON)) {
+                runLowerFunnelSideIndex(.5);
+                runLowerFarSideIndex(.5);
+            }
+            else if (oi.getGamepadButton(RobotMap.X_BUTTON)) {
+                runUpperBelt(0.5);
+                runLoadBelt(0.50);
+            }
         }
 
+        if (oi.getGamepadButton(RobotMap.Y_BUTTON)) {
+            runLoadBelt(0.5);
+            runUpperBelt(0.5);
+        }
+        else if (oi.getGamepadButton(RobotMap.B_BUTTON)) {
+            runUpperBelt(-0.5);
+            runLoadBelt(-0.50);
+        }
         else {
-
-            // stopIndexer();
-            bringToTop();
-
+            runUpperBelt(0.0);
+            runLoadBelt(0.0);
         }
+
+        if (oi.getGamepadButton(RobotMap.X_BUTTON)) {
+            runLowerFarSideIndex(0.5);
+            runLowerFunnelSideIndex(0.5);
+        }
+        else if (oi.getGamepadButton(RobotMap.A_BUTTON)) {
+            runLowerFarSideIndex(-0.5);
+            runLowerFunnelSideIndex(-0.50);
+        }
+        else {
+            runLowerFarSideIndex(0.0);
+            runLowerFunnelSideIndex(0.0);
+        }
+        
     }
 
     public void bringToTop() {
@@ -126,7 +153,7 @@ public class Indexing {
         }
         else {
             runUpperBelt(0.0);
-            runLoadBelt(0.0);
+            //runLoadBelt(0.0);
         }
     }
 
@@ -181,7 +208,7 @@ public class Indexing {
         return ballsInRobot;
     }
 
-    private boolean[] updateBallPoitions() {
+    public boolean[] updateBallPoitions() {
         ballInPos0 = bannerPos0.get();
         ballInPos1 = bannerPos1.get();
         ballInPos2 = bannerPos2.get();

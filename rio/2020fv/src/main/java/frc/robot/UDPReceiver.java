@@ -22,8 +22,6 @@ public class UDPReceiver implements Runnable {
     DatagramPacket dat;
     byte[] receiveData = new byte[24]; // data should be 4 floats in
                                        // length
-    final Float ERROR = 2f;
-
     // data values from the Jetson
     float xValue;
     float yValue;
@@ -38,6 +36,7 @@ public class UDPReceiver implements Runnable {
             // open a datagram socket to receive messages
             // should be a different port than the sender
             socket = new DatagramSocket(RobotMap.RECEIVER_SOCKET);
+            socket.setSoTimeout(1);
 
             // create a datagram packet to receive data of a certain length
             dat = new DatagramPacket(receiveData, receiveData.length);

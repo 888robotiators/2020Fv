@@ -1,6 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
@@ -46,6 +48,10 @@ public class Intake {
 
         flipButtonLast = flipButton;
 
+        // if (intakeFlipper.get().equals(Value.kForward)) {
+        //     intakeIn();
+        // }
+
     }
 
     public void flipIntake(boolean flip) {
@@ -62,12 +68,12 @@ public class Intake {
     }
 
     public void intakeIn() {
-        intakeMotor.set(ControlMode.PercentOutput, 0.75);
+        intakeMotor.set(ControlMode.PercentOutput, 1.0);
         isRunning = true;
     }
 
     public void intakeReverse() {
-        intakeMotor.set(ControlMode.PercentOutput, -0.75);
+        intakeMotor.set(ControlMode.PercentOutput, -1.0);
         isRunning = true;
     }
 

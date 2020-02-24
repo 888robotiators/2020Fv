@@ -40,14 +40,14 @@ public class WaypointTravel {
      */
     public boolean goToWaypoint(Waypoint destination, double speed) {
 
-        double desiredX = 48;
+        double desiredX = 0;
         destination.getX();
-        double desiredY = -48;
+        double desiredY = 48;
         destination.getY();
         double desiredAngle = 0;
         RobotMath.modAngleDegrees(destination.getHeading());
         SmartDashboard.putNumber("dtheta", desiredAngle);
-        speed = -.1;
+        speed = .1;
 
         // Finds where the robot is on the field
         pose = location.getPose();
@@ -297,7 +297,7 @@ public class WaypointTravel {
 
         speed = 0;
         double proportionAdjustment = 0;
-        double integeralAdjustment = 0;
+
 
         if (angle > 180) {
             // ...go the other way around the circle.
@@ -307,7 +307,7 @@ public class WaypointTravel {
         proportionAdjustment = Math.max(0.1525,
                 Math.min(1.0, (Math.abs(angle) / 360)));
 
-        speedAdjustment = proportionAdjustment + integeralAdjustment;
+        speedAdjustment = proportionAdjustment;
 
         leftThrust = angle > 0 ? Math.abs(speed + speedAdjustment)
                 : -Math.abs(speed + speedAdjustment);

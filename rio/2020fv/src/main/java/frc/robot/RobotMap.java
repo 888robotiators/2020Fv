@@ -21,7 +21,6 @@ public class RobotMap {
     public static final int DS_FORWARD_CHANNEL = 0;
     public static final int TURRET_CANID = 26;
     public static final int CLIMBER_CANID = 20;
-    public static final int JETSON_RINGLIGHT_CHANNEL = 1;
 
     // USB IDs in the DS for the controller.
     public static final int LEFT_JOYSTICK = 0;
@@ -96,5 +95,9 @@ public class RobotMap {
     public static final int BALL_POS_4_CHANNEL = 4;
 
     public static final int TURRET_ENCODER_CHANNEL = 9;
+
+    public static final int SHOOTER_RPM_TOLERANCE = 100;
+
+    public static final int JETSON_RINGLIGHT_CHANNEL = 7;
 
 }

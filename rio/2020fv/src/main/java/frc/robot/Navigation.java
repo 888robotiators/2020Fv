@@ -132,7 +132,7 @@ public class Navigation {
                     * (1 / (1 - RobotMap.JOYSTICK_DEADZONE))
                     * Math.signum(rightInput);
 
-            drive.move(leftInput * 0.5, rightInput * 0.5);
+            drive.move(leftInput * 0.6, rightInput * 0.6);
 
         }
 

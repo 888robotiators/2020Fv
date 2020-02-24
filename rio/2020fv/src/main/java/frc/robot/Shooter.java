@@ -74,7 +74,10 @@ public class Shooter {
         rpms = encoder.getVelocity();
         pose = location.getPose();
 
-        if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_TRIGGER)) {
+        if (oi.getRightStickButton(6)) {
+            shooterMotor.set(-0.75);
+        }
+        else if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_TRIGGER)) {
             // shootDistance(map.get("AllianceTargetZone"));
             setShooterOutputVelocity(targetRPM);
         }
@@ -119,6 +122,7 @@ public class Shooter {
      * @param velocity The exit velocity in feet per second.
      */
     public void setShooterOutputVelocity(double velocity) {
+        targetRPM = velocity;
         pid.setReference(velocity, ControlType.kVelocity);
         if (velocity <= 1) {
             pid.setIAccum(0);

@@ -7,8 +7,14 @@
 
 package frc.robot;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -34,6 +40,7 @@ public class Robot extends TimedRobot {
     OI oi;
     Shooter shooter;
     Turret turret;
+    JetsonLight jetsonLight;
 
     DeadReckoning location;
 
@@ -43,6 +50,10 @@ public class Robot extends TimedRobot {
     UDPReceiver receive;
     WaypointMap map;
 
+    UsbCamera camera0;
+    UsbCamera camera1;
+
+    NetworkTableEntry autoCode;
     Scenario autoScenario;
     Commander auto;
 
@@ -56,6 +67,10 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+
+        NetworkTableInstance inst = NetworkTableInstance.getDefault();
+        NetworkTable table = inst.getTable("Auto Scenario");
+        autoCode = table.getEntry("Auto Play Number");
 
         try {
             map = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
@@ -80,11 +95,17 @@ public class Robot extends TimedRobot {
         location = new DeadReckoning(drive, imu, receive, map);
         guidence = new WaypointTravel(drive, location);
         nav = new Navigation(oi, drive, guidence);
+        jetsonLight = new JetsonLight(oi);
+
+        camera0 = CameraServer.getInstance().startAutomaticCapture(0);
+        camera1 = CameraServer.getInstance().startAutomaticCapture(1);
+
 
         shooter = new Shooter(oi, location, index, turret, map);
 
         compressor = new Compressor(RobotMap.PCM);
 
+        //SmartDashboard.putData("Auto Scenarios", autoChooser);
         auto = new Commander(autoScenario, map, location, guidence, intake,
                 index, shooter);
 
@@ -99,6 +120,7 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() {
         location.updateTracker();
         location.updateDashboard();
+        index.updateBallPoitions();
         auto.periodic();
 
     }
@@ -107,12 +129,12 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         compressor.setClosedLoopControl(true);
         location.reset();
-        // send.sendMessage();
+        send.sendMessage();
     }
 
     @Override
     public void teleopPeriodic() {
-        // receive.run();
+        receive.run();
         location.updateTracker();
         location.updateDashboard();
         nav.navTeleopPeriodic();
@@ -121,6 +143,7 @@ public class Robot extends TimedRobot {
         index.indexPeriodic();
         shooter.shooterTeleopPeriodic();
         turret.turretTeleopPeriodic();
+        jetsonLight.jetsonLightPeriodic();
     }
 
     @Override
