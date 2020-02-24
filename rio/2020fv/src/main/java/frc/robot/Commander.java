@@ -107,6 +107,7 @@ public class Commander {
                                 shooter.setShooterOutputVelocity(Integer.parseInt(currentArgs[1]));
                                 isDone = true;
                             }
+
                             break;
                         case "intake":
                             if (currentArgs[0].equalsIgnoreCase("intakeDown")) {

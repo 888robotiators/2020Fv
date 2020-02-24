@@ -9,9 +9,7 @@ package frc.robot;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -53,7 +51,6 @@ public class Robot extends TimedRobot {
     UsbCamera camera0;
     UsbCamera camera1;
 
-    NetworkTableEntry autoCode;
     Scenario autoScenario;
     Commander auto;
 
@@ -68,13 +65,9 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
 
-        NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        NetworkTable table = inst.getTable("Auto Scenario");
-        autoCode = table.getEntry("Auto Play Number");
-
         try {
             map = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
-            autoScenario = new Scenario(new File("/home/lvuser/TestAuto.txt"));
+            autoScenario = new Scenario(new File("/home/lvuser/AutoPlay5.txt"));
             SmartDashboard.putBoolean("Suicide", false);
         }
         catch (FileNotFoundException e) {
@@ -100,6 +93,9 @@ public class Robot extends TimedRobot {
         camera0 = CameraServer.getInstance().startAutomaticCapture(0);
         camera1 = CameraServer.getInstance().startAutomaticCapture(1);
 
+
+        camera0 = CameraServer.getInstance().startAutomaticCapture(0);
+        camera1 = CameraServer.getInstance().startAutomaticCapture(1);
 
         shooter = new Shooter(oi, location, index, turret, map);
 

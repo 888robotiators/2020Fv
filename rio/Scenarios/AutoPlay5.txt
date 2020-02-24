@@ -1,0 +1,3 @@
+##name=AutoPlay5
+command.wait,5
+shooter.shoot,2750
