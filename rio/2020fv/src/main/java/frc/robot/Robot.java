@@ -68,17 +68,18 @@ public class Robot extends TimedRobot {
         try {
             map = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
             autoScenario = new Scenario(new File("/home/lvuser/AutoPlay5.txt"));
-            SmartDashboard.putBoolean("Suicide", false);
+            SmartDashboard.putBoolean("Scenario loaded", false);
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
-            SmartDashboard.putBoolean("Suicide", true);
+            SmartDashboard.putBoolean("Scenario loaded", true);
         }
 
         oi = new OI();
         drive = new DriveTrain();
         intake = new Intake(oi);
-        index = new Indexing(oi, intake);
+        shooter = new Shooter(oi, location, turret, map);
+        index = new Indexing(oi, intake, shooter);
         climb = new Climber(oi);
         turret = new Turret(oi);
 
@@ -96,8 +97,6 @@ public class Robot extends TimedRobot {
 
         camera0 = CameraServer.getInstance().startAutomaticCapture(0);
         camera1 = CameraServer.getInstance().startAutomaticCapture(1);
-
-        shooter = new Shooter(oi, location, index, turret, map);
 
         compressor = new Compressor(RobotMap.PCM);
 
@@ -136,7 +135,7 @@ public class Robot extends TimedRobot {
         nav.navTeleopPeriodic();
         climb.climberTeleopPeriodic();
         intake.intakeTeleopPeriodic();
-        index.indexPeriodic();
+        index.indexManualControls();
         shooter.shooterTeleopPeriodic();
         turret.turretTeleopPeriodic();
         jetsonLight.jetsonLightPeriodic();

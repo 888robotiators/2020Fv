@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Shooter {
     private OI oi;
     private DeadReckoning location;
-    private Indexing index;
     private Turret turret;
     private WaypointMap map;
 
@@ -36,11 +35,10 @@ public class Shooter {
      * @param oi
      * @param p_receiveS
      */
-    public Shooter(OI oi, DeadReckoning location, Indexing index, Turret turret,
+    public Shooter(OI oi, DeadReckoning location, Turret turret,
             WaypointMap map) {
         this.oi = oi;
         this.location = location;
-        this.index = index;
         this.turret = turret;
         this.map = map;
 

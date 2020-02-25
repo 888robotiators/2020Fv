@@ -13,6 +13,7 @@ public class Indexing {
 
     OI oi;
     Intake intake;
+    Shooter shooter;
 
     TalonSRX funnelMotor;
     TalonSRX lowerFunnelSideIndex;
@@ -36,15 +37,11 @@ public class Indexing {
 
     boolean loading = false;
 
-    // funnel = if (B4) , dom n gert gave me this -> if((!B0 && !B1 && !B2) ||
-    // intake.intakeRunning())
-    // middle = if (!B0 && B1) || (!B1 && B2) || (!B2 && B3)
-    // upper = if (!B0 && B1)
-
-    public Indexing(OI oi, Intake intake) {
+    public Indexing(OI oi, Intake intake, Shooter shooter) {
 
         this.oi = oi;
         this.intake = intake;
+        this.shooter = shooter;
 
         funnelMotor = new TalonSRX(RobotMap.FUNNEL_MOTOR_CANID);
         lowerFunnelSideIndex = new TalonSRX(
@@ -68,9 +65,12 @@ public class Indexing {
         bannerPos4 = new DigitalInput(4);
     }
 
-    public void indexPeriodic() {
-        updateBallPoitions();
-
+    /**
+     * Runs periodically to control the index
+     */
+    public void indexManualControls() {
+        
+        // Check to see if the d-pad is being used for manual contro
         if (oi.getGamepadPOV() != -1) {
 
             if (oi.getGamepadPOV() == 0) {
@@ -88,16 +88,10 @@ public class Indexing {
                 runUpperBelt(-0.5);
                 runLoadBelt(-0.50);
             }
-            else if (oi.getGamepadButton(RobotMap.Y_BUTTON)) {
-                runLowerFunnelSideIndex(.5);
-                runLowerFarSideIndex(.5);
-            }
-            else if (oi.getGamepadButton(RobotMap.X_BUTTON)) {
-                runUpperBelt(0.5);
-                runLoadBelt(0.50);
-            }
+
         }
 
+        else { 
         if (oi.getGamepadButton(RobotMap.Y_BUTTON)) {
             runLoadBelt(0.5);
             runUpperBelt(0.5);
@@ -123,7 +117,7 @@ public class Indexing {
             runLowerFarSideIndex(0.0);
             runLowerFunnelSideIndex(0.0);
         }
-        
+    }
     }
 
     public void bringToTop() {
@@ -153,7 +147,7 @@ public class Indexing {
         }
         else {
             runUpperBelt(0.0);
-            //runLoadBelt(0.0);
+            runLoadBelt(0.0);
         }
     }
 
@@ -209,7 +203,8 @@ public class Indexing {
     }
 
     public boolean[] updateBallPoitions() {
-        ballInPos0 = bannerPos0.get();
+        if (!(ballInPos0 && !shooter.readyToFire()))
+            ballInPos0 = bannerPos0.get();
         ballInPos1 = bannerPos1.get();
         ballInPos2 = bannerPos2.get();
         ballInPos3 = bannerPos3.get();
