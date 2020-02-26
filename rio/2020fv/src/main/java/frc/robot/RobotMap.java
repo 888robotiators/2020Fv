@@ -77,7 +77,7 @@ public class RobotMap {
 
     public static final int RECEIVER_SOCKET = 5555;
 
-    public static final double JOYSTICK_DEADZONE = 0.2;
+    public static final double JOYSTICK_DEADZONE = 0.15;
     public static final double RAMP_RATE = 0.2;
 
     public static final double CLICKS_PER_INCH = 0.46683;
@@ -99,5 +99,7 @@ public class RobotMap {
     public static final int SHOOTER_RPM_TOLERANCE = 100;
 
     public static final int JETSON_RINGLIGHT_CHANNEL = 7;
+
+    public static final double INDEX_MAX_SPEED = 0.5;
 
 }

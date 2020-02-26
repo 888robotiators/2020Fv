@@ -69,7 +69,7 @@ public class DeadReckoning {
     public void updateTracker() {
         // Calls the method to get the most recent encoder data
         updateSensorVals();
-        // checkVision();
+        checkVision();
 
         // Calculates the change in the encoders and heading since the last time
         // the method was called.

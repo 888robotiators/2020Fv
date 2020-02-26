@@ -58,6 +58,7 @@ public class Intake {
     /**
      * Toggles the state of the intake arm. If the arm is out, it will be
      * flipped in, and if it is in, it will be flipped out.
+     * 
      * @param flip True to toggle
      */
     public void flipIntake(boolean flip) {
@@ -115,6 +116,7 @@ public class Intake {
 
     /**
      * Gets whether or not the intake wheels are running.
+     * 
      * @return True if the wheels are running.
      */
     public boolean isRunning() {
@@ -123,6 +125,7 @@ public class Intake {
 
     /**
      * Gets the state of the intake arms.
+     * 
      * @return True if the intake arms are flipped out.
      */
     public boolean isFlippedOut() {

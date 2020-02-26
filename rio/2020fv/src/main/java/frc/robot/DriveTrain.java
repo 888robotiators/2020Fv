@@ -20,10 +20,6 @@ public class DriveTrain {
     CANSparkMax rearLeft;
     CANSparkMax frontRight;
     CANSparkMax rearRight;
-    CANPIDController frontLeft_PID;
-    CANPIDController rearLeft_PID;
-    CANPIDController frontRight_PID;
-    CANPIDController rearRight_PID;
 
     CANEncoder leftEncoder;
     CANEncoder rightEncoder;
