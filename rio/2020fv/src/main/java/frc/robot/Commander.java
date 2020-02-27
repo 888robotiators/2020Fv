@@ -134,6 +134,10 @@ public class Commander {
                                     isDone = true;
                                 }
                             }
+
+                            if (currentArgs[0].equalsIgnoreCase("runPlay")) {
+                                isDone = true;
+                            }
     
                             break;
                         default:

@@ -57,7 +57,9 @@ public class Robot extends TimedRobot {
     boolean done = false;
 
     int delay;
-    int counter = 0;
+    int counter ;
+
+    boolean timeToMove;
 
     @Override
     public void robotInit() {
@@ -70,12 +72,13 @@ public class Robot extends TimedRobot {
         catch (FileNotFoundException e) {
             e.printStackTrace();
             SmartDashboard.putBoolean("Suicide", true);
-        }
+        } 
 
         oi = new OI();
         drive = new DriveTrain();
         intake = new Intake(oi);
-        index = new Indexing(oi, intake);
+        shooter = new Shooter(oi, location, turret, map);
+        index = new Indexing(oi, intake, shooter);
         climb = new Climber(oi);
         turret = new Turret(oi);
 
@@ -89,8 +92,6 @@ public class Robot extends TimedRobot {
         camera0 = CameraServer.getInstance().startAutomaticCapture(0);
         camera1 = CameraServer.getInstance().startAutomaticCapture(1);
 
-        shooter = new Shooter(oi, location, index, turret, map);
-
         compressor = new Compressor(RobotMap.PCM);
 
         auto = new Commander(autoScenario, map, location, guidence, intake,
@@ -100,15 +101,32 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        location.reset();
+        drive.resetEncoderOffset();
+        counter = 0;
+        
     }
 
     @Override
     public void autonomousPeriodic() {
-        location.updateTracker();
-        location.updateDashboard();
         index.updateBallPoitions();
-        auto.periodic();
+        index.bringToTop();
+        shooter.setShooterOutputVelocity(2750);
+        if(shooter.readyToFire()) {
+            index.loadShooter();
+        }
+    
+        if(counter > 6 * 50) {
+            shooter.stop();
+            index.stopIndexer();
+            //if((drive.getLeft().getPosition() < 5.60196)) {
+                drive.move(-0.65, -0.65);
+            //}
+            //else {
+            //   drive.move(0,0);
+            //}
+        }
+
+        counter++;
 
     }
 
@@ -127,7 +145,7 @@ public class Robot extends TimedRobot {
         nav.navTeleopPeriodic();
         climb.climberTeleopPeriodic();
         intake.intakeTeleopPeriodic();
-        index.indexPeriodic();
+        index.indexManualControls();
         shooter.shooterTeleopPeriodic();
         turret.turretTeleopPeriodic();
     }
