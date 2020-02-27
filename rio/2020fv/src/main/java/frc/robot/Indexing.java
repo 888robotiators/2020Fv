@@ -70,54 +70,56 @@ public class Indexing {
      */
     public void indexManualControls() {
 
-        // Check to see if the d-pad is being used for manual contro
-        if (oi.getGamepadPOV() != -1) {
+        // Gets joystick values
+        double leftGamepadStick = oi.getGamepadAxis(RobotMap.GP_L_Y_AXIS);
+        double rightGamepadStick = oi.getGamepadAxis(RobotMap.GP_R_Y_AXIS);
 
-            if (oi.getGamepadPOV() == 0) {
-                runFunnel(.5);
-                runLowerFunnelSideIndex(.5);
-                runLowerFarSideIndex(.5);
-                runUpperBelt(.5);
-                runLoadBelt(.5);
-            }
+        // If the joystick value is outside the deadzone
+        if (Math.abs(leftGamepadStick) > RobotMap.JOYSTICK_DEADZONE) {
 
-            else if (oi.getGamepadPOV() == 180) {
-                runFunnel(-0.5);
-                runLowerFunnelSideIndex(-0.5);
-                runLowerFarSideIndex(-0.5);
-                runUpperBelt(-0.5);
-                runLoadBelt(-0.50);
-            }
+            // Scales the value
+            leftGamepadStick = (Math.abs(leftGamepadStick) - RobotMap.JOYSTICK_DEADZONE)
+                    * (1 / (1 - RobotMap.JOYSTICK_DEADZONE))
+                    * Math.signum(leftGamepadStick) * RobotMap.INDEX_MAX_SPEED;
+
+            // Runs the motors
+            runFunnel(leftGamepadStick);
+            runLowerFarSideIndex(leftGamepadStick);
+            runLowerFunnelSideIndex(leftGamepadStick);
 
         }
 
+        // Otherwise stop motors
         else {
-            if (oi.getGamepadButton(RobotMap.Y_BUTTON)) {
-                runLoadBelt(0.5);
-                runUpperBelt(0.5);
-            }
-            else if (oi.getGamepadButton(RobotMap.B_BUTTON)) {
-                runUpperBelt(-0.5);
-                runLoadBelt(-0.50);
-            }
-            else {
-                runUpperBelt(0.0);
-                runLoadBelt(0.0);
-            }
 
-            if (oi.getGamepadButton(RobotMap.X_BUTTON)) {
-                runLowerFarSideIndex(0.5);
-                runLowerFunnelSideIndex(0.5);
-            }
-            else if (oi.getGamepadButton(RobotMap.A_BUTTON)) {
-                runLowerFarSideIndex(-0.5);
-                runLowerFunnelSideIndex(-0.50);
-            }
-            else {
-                runLowerFarSideIndex(0.0);
-                runLowerFunnelSideIndex(0.0);
-            }
+            runFunnel(0.0);
+            runLowerFarSideIndex(0.0);
+            runLowerFunnelSideIndex(0.0);            
+
         }
+
+        // If the joystick value is outside the deadzone
+        if (Math.abs(rightGamepadStick) > RobotMap.JOYSTICK_DEADZONE) {
+
+            // Scales the value
+            rightGamepadStick = (Math.abs(rightGamepadStick) - RobotMap.JOYSTICK_DEADZONE)
+                    * (1 / (1 - RobotMap.JOYSTICK_DEADZONE))
+                    * Math.signum(rightGamepadStick) * RobotMap.INDEX_MAX_SPEED;
+
+            // Runs the motors
+            runLoadBelt(rightGamepadStick);
+            runUpperBelt(rightGamepadStick);
+
+        }
+
+        // Otherwise stop motors
+        else {
+
+            runLoadBelt(0.0);
+            runUpperBelt(0.0);         
+
+        }
+
     }
 
     /**
