@@ -22,13 +22,16 @@ public class UDPReceiver implements Runnable {
     DatagramPacket dat;
     byte[] receiveData = new byte[24]; // data should be 4 floats in
                                        // length
+
+    Position targetPos;
+
     // data values from the Jetson
-    float xValue;
-    float yValue;
-    float zValue;
-    float roll;
-    float pitch;
-    float heading;
+    float xValue = -99f;
+    float yValue = -99f;
+    float zValue = -99f;
+    float roll = -99f;
+    float pitch = -99f;
+    float heading = -99f;
 
     public UDPReceiver() {
 
@@ -44,6 +47,8 @@ public class UDPReceiver implements Runnable {
         catch (SocketException e) {
             e.printStackTrace();
         }
+
+        targetPos = new Position(xValue, yValue, zValue, heading, roll, pitch);
     }
 
     @Override
@@ -51,7 +56,8 @@ public class UDPReceiver implements Runnable {
         receiveMessage();
     }
 
-    public synchronized void receiveMessage() {
+    public void receiveMessage() {
+        while (true) {
         try {
             socket.receive(dat);
 
@@ -62,15 +68,13 @@ public class UDPReceiver implements Runnable {
             roll = bbuf.getFloat(12);
             pitch = bbuf.getFloat(16);
             heading = bbuf.getFloat(20);
-            // heading = Math.atan2((double) XValue, (double) YValue) *
-            // (180/Math.PI);
 
-            SmartDashboard.putNumber("X Value", (double) xValue);
-            SmartDashboard.putNumber("Y Value", (double) yValue);
-            SmartDashboard.putNumber("Z Value", (double) zValue);
-            SmartDashboard.putNumber("Roll", (double) roll);
-            SmartDashboard.putNumber("Pitch", (double) pitch);
-            SmartDashboard.putNumber("Yaw", (double) heading);
+            // SmartDashboard.putNumber("X Value", (double) xValue);
+            // SmartDashboard.putNumber("Y Value", (double) yValue);
+            // SmartDashboard.putNumber("Z Value", (double) zValue);
+            // SmartDashboard.putNumber("Roll", (double) roll);
+            // SmartDashboard.putNumber("Pitch", (double) pitch);
+            // SmartDashboard.putNumber("Yaw", (double) heading);
             // SmartDashboard.putNumber("line heading", (double) heading);
             if ((int) xValue != -99 && (int) yValue != -99
                     && (int) zValue != -99) {
@@ -85,6 +89,15 @@ public class UDPReceiver implements Runnable {
         catch (Exception e) {
             e.printStackTrace();
         }
+
+        targetPos.setX(xValue);
+        targetPos.setY(yValue);
+        targetPos.setZ(zValue);
+        targetPos.setHeading(heading);
+        targetPos.setPitch(pitch);
+        targetPos.setRoll(roll);
+
+    }
     }
 
     public boolean hasVision() {
@@ -96,13 +109,8 @@ public class UDPReceiver implements Runnable {
         }
     }
 
-    public synchronized double[] getTarget() {
-
-        return new double[] { xValue, yValue, zValue, roll, pitch, heading };
-    }
-
     public synchronized Position getTargetPosition() {
-        return new Position(xValue, yValue, zValue, heading, roll, pitch);
+        return targetPos;
     }
     /*
      * public synchronized double getTarget() { return zValue; }

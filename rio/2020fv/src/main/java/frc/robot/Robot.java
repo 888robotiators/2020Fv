@@ -48,6 +48,8 @@ public class Robot extends TimedRobot {
     UDPReceiver receive;
     WaypointMap map;
 
+    Thread receiverThread;
+
     UsbCamera camera0;
     UsbCamera camera1;
 
@@ -91,6 +93,8 @@ public class Robot extends TimedRobot {
         nav = new Navigation(oi, drive, guidence);
         jetsonLight = new JetsonLight(oi);
 
+        receiverThread = new Thread(receive);
+
         camera0 = CameraServer.getInstance().startAutomaticCapture(0);
         camera1 = CameraServer.getInstance().startAutomaticCapture(1);
 
@@ -103,6 +107,8 @@ public class Robot extends TimedRobot {
         //SmartDashboard.putData("Auto Scenarios", autoChooser);
         auto = new Commander(autoScenario, map, location, guidence, intake,
                 index, shooter);
+
+        receiverThread.start();
 
     }
 
@@ -129,7 +135,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        receive.run();
         location.updateTracker();
         location.updateDashboard();
         nav.navTeleopPeriodic();
