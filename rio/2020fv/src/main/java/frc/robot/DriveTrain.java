@@ -94,6 +94,10 @@ public class DriveTrain {
                 -(frontRight.getEncoder().getPosition() - rightEncoderOffset) };
     }
 
+    public CANEncoder getLeft() {
+        return frontLeft.getEncoder();
+    }
+
     /**
      * Resets the value of the encoder to zero.
      */
