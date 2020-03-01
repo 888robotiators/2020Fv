@@ -98,14 +98,8 @@ public class Commander {
                                     }
                                 }
                                 else {
-                                    shooter.stop();
-                                    index.stopIndexer();
                                     isDone = true;
                                 }
-                            }
-                            if (currentArgs[0].equalsIgnoreCase("spin")) {
-                                shooter.setShooterOutputVelocity(Integer.parseInt(currentArgs[1]));
-                                isDone = true;
                             }
                             break;
                         case "intake":
@@ -139,6 +133,10 @@ public class Commander {
                                     counter = 0;
                                     isDone = true;
                                 }
+                            }
+
+                            if (currentArgs[0].equalsIgnoreCase("runPlay")) {
+                                isDone = true;
                             }
     
                             break;

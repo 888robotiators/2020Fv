@@ -21,6 +21,7 @@ public class RobotMap {
     public static final int DS_FORWARD_CHANNEL = 0;
     public static final int TURRET_CANID = 26;
     public static final int CLIMBER_CANID = 20;
+    public static final int JETSON_RINGLIGHT_CHANNEL = 1;
 
     // USB IDs in the DS for the controller.
     public static final int LEFT_JOYSTICK = 0;
@@ -98,6 +99,15 @@ public class RobotMap {
 
     public static final int SHOOTER_RPM_TOLERANCE = 100;
 
-    public static final int JETSON_RINGLIGHT_CHANNEL = 7;
+    public static final double RPM_WHITELINE = 2750;
+    public static final double RPM_COLORWHEEL = 3800;
+    public static final double RPM_IDKBRV = 3250;
+
+    public static final double[] RPM_SETPOINTS = new double[] {RPM_WHITELINE, RPM_COLORWHEEL, RPM_IDKBRV};
+    public static final int NUM_RPM_SETPOINTS = RPM_SETPOINTS.length;
+
+    public static final String[] RPM_SETPOINTS_NAMES = new String[] {"RPM_WHITELINE", "RPM_COLORWHEEL", "RPM_IDKBRV"};
+
+    public static final double INDEX_MAX_SPEED = 0.5;
 
 }

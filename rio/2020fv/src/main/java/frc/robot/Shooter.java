@@ -30,14 +30,18 @@ public class Shooter {
     private double targetRPM;
     private double rpms;
 
+    private boolean lastUp, lastDown;
+    private boolean lastCycleUp, lastCycleDown;
+
+    private int selectedRPM;
+
     /**
      * receive
      *
      * @param oi
      * @param p_receiveS
      */
-    public Shooter(OI oi, DeadReckoning location, Indexing index, Turret turret,
-            WaypointMap map) {
+    public Shooter(OI oi, DeadReckoning location, Turret turret, WaypointMap map) {
         this.oi = oi;
         this.location = location;
         this.index = index;
@@ -67,12 +71,37 @@ public class Shooter {
 
         shooterMotor.setClosedLoopRampRate(0.1);
         shooterMotor.setOpenLoopRampRate(0.1);
+
+        selectedRPM = 0;
     }
 
     public void shooterTeleopPeriodic() {
 
         rpms = encoder.getVelocity();
-        pose = location.getPose();
+        //pose = location.getPose();
+
+        if(oi.getRightStickButton(6) && !lastCycleUp) {
+            if(selectedRPM == RobotMap.NUM_RPM_SETPOINTS-1) {
+                selectedRPM = 0;
+                targetRPM = RobotMap.RPM_SETPOINTS[selectedRPM];
+            }
+            else {
+                selectedRPM++;
+                targetRPM = RobotMap.RPM_SETPOINTS[selectedRPM];
+            }
+        }
+
+        if(oi.getRightStickButton(4) && !lastCycleDown) {
+            if(selectedRPM == 0) {
+                selectedRPM = RobotMap.NUM_RPM_SETPOINTS-1;
+                targetRPM = RobotMap.RPM_SETPOINTS[selectedRPM];
+            }
+            else {
+                selectedRPM--;
+                targetRPM = RobotMap.RPM_SETPOINTS[selectedRPM];
+            }
+        }
+
 
         if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_TRIGGER)) {
             // shootDistance(map.get("AllianceTargetZone"));
@@ -82,19 +111,30 @@ public class Shooter {
             stop();
         }
 
-        if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_UPPER_LEFT_BUTTON))
-            targetRPM += 10;
-        if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_LOWER_LEFT_BUTTON))
-            targetRPM -= 10;
+        if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_UPPER_LEFT_BUTTON) && !lastUp) {
+            if(targetRPM < 4000)
+                targetRPM += 50;
+        }
+        if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_LOWER_LEFT_BUTTON) && !lastDown) {
+            if(targetRPM > 2500)
+                targetRPM -= 50;
+        }
 
+        lastUp = oi.getRightStickButton(RobotMap.JOYSTICK_3D_UPPER_LEFT_BUTTON);
+        lastDown = oi.getRightStickButton(RobotMap.JOYSTICK_3D_LOWER_LEFT_BUTTON);
+        
         SmartDashboard.putNumber("Encoder RPMs", rpms);
         SmartDashboard.putNumber("Target RPMs", targetRPM);
+        SmartDashboard.putString("Shooter Range", RobotMap.RPM_SETPOINTS_NAMES[selectedRPM]);
         // SmartDashboard.putNumber("kP", pid.getP());
         // SmartDashboard.putNumber("kI", pid.getI());
         // SmartDashboard.putNumber("kD", pid.getD());
         // SmartDashboard.putNumber("kFF", pid.getFF());
         // SmartDashboard.putNumber("DistanceAwayFromTarget",
         // receiver.getTarget()[2]);
+
+        lastCycleUp = oi.getRightStickButton(6);
+        lastCycleDown = oi.getRightStickButton(4);
     }
 
     /**

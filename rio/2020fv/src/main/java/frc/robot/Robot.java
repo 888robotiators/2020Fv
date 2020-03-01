@@ -12,14 +12,13 @@ import edu.wpi.first.cameraserver.CameraServer;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Command;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
 import disc.data.Scenario;
 import disc.data.WaypointMap;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -49,10 +48,11 @@ public class Robot extends TimedRobot {
     UDPReceiver receive;
     WaypointMap map;
 
+    Thread receiverThread;
+
     UsbCamera camera0;
     UsbCamera camera1;
-    
-    SendableChooser autoChooser;
+
     Scenario autoScenario;
     Commander auto;
 
@@ -69,18 +69,19 @@ public class Robot extends TimedRobot {
 
         try {
             map = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
-            autoScenario = new Scenario(new File("/home/lvuser/TestAuto.txt"));
-            SmartDashboard.putBoolean("Suicide", false);
+            autoScenario = new Scenario(new File("/home/lvuser/AutoPlay5.txt"));
+            SmartDashboard.putBoolean("Scenario loaded", false);
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
-            SmartDashboard.putBoolean("Suicide", true);
+            SmartDashboard.putBoolean("Scenario loaded", true);
         }
 
         oi = new OI();
         drive = new DriveTrain();
         intake = new Intake(oi);
-        index = new Indexing(oi, intake);
+        shooter = new Shooter(oi, location, turret, map);
+        index = new Indexing(oi, intake, shooter);
         climb = new Climber(oi);
         turret = new Turret(oi);
 
@@ -92,20 +93,22 @@ public class Robot extends TimedRobot {
         nav = new Navigation(oi, drive, guidence);
         jetsonLight = new JetsonLight(oi);
 
+        receiverThread = new Thread(receive);
+
         camera0 = CameraServer.getInstance().startAutomaticCapture(0);
         camera1 = CameraServer.getInstance().startAutomaticCapture(1);
 
 
-        shooter = new Shooter(oi, location, index, turret, map);
+        camera0 = CameraServer.getInstance().startAutomaticCapture(0);
+        camera1 = CameraServer.getInstance().startAutomaticCapture(1);
 
         compressor = new Compressor(RobotMap.PCM);
 
-        autoChooser = new SendableChooser<>();
-        autoChooser.addDefault("Default Auto", null);
-        autoChooser.addObject("Auto Scenario 2", null);
-        SmartDashboard.putData("Auto Scenarios", autoChooser);
+        //SmartDashboard.putData("Auto Scenarios", autoChooser);
         auto = new Commander(autoScenario, map, location, guidence, intake,
                 index, shooter);
+
+        receiverThread.start();
 
     }
 
@@ -127,21 +130,21 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         compressor.setClosedLoopControl(true);
         location.reset();
-        // send.sendMessage();
+        send.sendMessage();
     }
 
     @Override
     public void teleopPeriodic() {
-        // receive.run();
         location.updateTracker();
         location.updateDashboard();
         nav.navTeleopPeriodic();
         climb.climberTeleopPeriodic();
         intake.intakeTeleopPeriodic();
-        index.indexPeriodic();
+        index.indexManualControls();
         shooter.shooterTeleopPeriodic();
         turret.turretTeleopPeriodic();
         jetsonLight.jetsonLightPeriodic();
+        SmartDashboard.putString("pos", receive.getTargetPosition().toString());
     }
 
     @Override
