@@ -30,19 +30,36 @@ public class Shooter {
     private double targetRPM;
     private double rpms;
 
+<<<<<<< Updated upstream
+=======
+    private boolean lastUp, lastDown;
+    private boolean lastCycleUp, lastCycleDown;
+
+    private int selectedRPM;
+
+    private double distanceToTarget;
+
+    private UDPReceiver receiver;
+
+>>>>>>> Stashed changes
     /**
      * receive
      *
      * @param oi
      * @param p_receiveS
      */
+<<<<<<< Updated upstream
     public Shooter(OI oi, DeadReckoning location, Indexing index, Turret turret,
             WaypointMap map) {
+=======
+    public Shooter(OI oi, DeadReckoning location, Turret turret, WaypointMap map, UDPReceiver receiver) {
+>>>>>>> Stashed changes
         this.oi = oi;
         this.location = location;
         this.index = index;
         this.turret = turret;
         this.map = map;
+        this.receiver = receiver;
 
         shooterMotor = new CANSparkMax(RobotMap.SHOOTER_CANID,
                 MotorType.kBrushless);
@@ -72,7 +89,38 @@ public class Shooter {
     public void shooterTeleopPeriodic() {
 
         rpms = encoder.getVelocity();
+<<<<<<< Updated upstream
         pose = location.getPose();
+=======
+        //pose = location.getPose();
+
+        if(oi.getRightStickButton(6) && !lastCycleUp) {
+            if(selectedRPM == RobotMap.NUM_RPM_SETPOINTS-1) {
+                selectedRPM = 0;
+                targetRPM = RobotMap.RPM_SETPOINTS[selectedRPM];
+            }
+            else {
+                selectedRPM++;
+                targetRPM = RobotMap.RPM_SETPOINTS[selectedRPM];
+            }
+        }
+
+        if(oi.getRightStickButton(4) && !lastCycleDown) {
+            if(selectedRPM == 0) {
+                selectedRPM = RobotMap.NUM_RPM_SETPOINTS-1;
+                targetRPM = RobotMap.RPM_SETPOINTS[selectedRPM];
+            }
+            else {
+                selectedRPM--;
+                targetRPM = RobotMap.RPM_SETPOINTS[selectedRPM];
+            }
+        }
+
+        if(oi.getGamepadButton(RobotMap.Y_BUTTON)) {
+            targetRPM = getRPMs();
+        }
+
+>>>>>>> Stashed changes
 
         if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_TRIGGER)) {
             // shootDistance(map.get("AllianceTargetZone"));
@@ -93,8 +141,15 @@ public class Shooter {
         // SmartDashboard.putNumber("kI", pid.getI());
         // SmartDashboard.putNumber("kD", pid.getD());
         // SmartDashboard.putNumber("kFF", pid.getFF());
+<<<<<<< Updated upstream
         // SmartDashboard.putNumber("DistanceAwayFromTarget",
         // receiver.getTarget()[2]);
+=======
+        SmartDashboard.putNumber("DistanceAwayFromTarget", receiver.getTarget()[2]);
+
+        lastCycleUp = oi.getRightStickButton(6);
+        lastCycleDown = oi.getRightStickButton(4);
+>>>>>>> Stashed changes
     }
 
     /**
@@ -135,12 +190,21 @@ public class Shooter {
         turret.setAngle(RobotMath.modAngleDegrees(Math.toDegrees(Math.atan2(
                 target.getX() - pose.getX(), target.getX() - pose.getY()))));
 
-        double distanceToTarget = Math
+        double distanceToTargetWP = Math
                 .sqrt(Math.pow(target.getX() - pose.getX(), 2)
                         + Math.pow(target.getX() - pose.getY(), 2));
 
-        targetRPM = distanceToTarget * 6.9;
+        targetRPM = distanceToTargetWP * 6.9;
 
+    }
+
+    public void shootDistanceWithVision() {
+        pid.setReference(getRPMVision(), ControlType.kVelocity);
+    }
+
+    public double getRPMVision() {
+        distanceToTarget = receiver.getTarget()[1];
+        return distanceToTarget * 6.9;
     }
 
     /**
