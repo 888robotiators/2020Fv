@@ -101,25 +101,20 @@ public class Commander {
                                     shooter.stop();
                                     index.stopIndexer();
                                     isDone = true;
-                                }
+                                }   
                             }
                             if (currentArgs[0].equalsIgnoreCase("spin")) {
                                 shooter.setShooterOutputVelocity(Integer.parseInt(currentArgs[1]));
                                 isDone = true;
                             }
-
                             break;
                         case "intake":
                             if (currentArgs[0].equalsIgnoreCase("intakeDown")) {
-                                intake.flipDown();
+                                intake.flipIntake(true);
                                 isDone = true;
                             }
                             if (currentArgs[0].equalsIgnoreCase("intakeUp")) {
                                 intake.flipUp();
-                                isDone = true;
-                            }
-                            if (currentArgs[0].equalsIgnoreCase("intakeRun")) {
-                                intake.intakeIn();
                                 isDone = true;
                             }
                             if (currentArgs[0].equalsIgnoreCase("intakeRun")) {
@@ -140,6 +135,10 @@ public class Commander {
                                     counter = 0;
                                     isDone = true;
                                 }
+                            }
+
+                            if (currentArgs[0].equalsIgnoreCase("runPlay")) {
+                                isDone = true;
                             }
     
                             break;

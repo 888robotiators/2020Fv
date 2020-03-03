@@ -13,6 +13,7 @@ public class Indexing {
 
     OI oi;
     Intake intake;
+    Shooter shooter;
 
     TalonSRX funnelMotor;
     TalonSRX lowerFunnelSideIndex;
@@ -35,16 +36,14 @@ public class Indexing {
     boolean ballInPos4;
 
     boolean loading = false;
+    boolean autoLower = true;
+    boolean autoUpper = true;
 
-    // funnel = if (B4) , dom n gert gave me this -> if((!B0 && !B1 && !B2) ||
-    // intake.intakeRunning())
-    // middle = if (!B0 && B1) || (!B1 && B2) || (!B2 && B3)
-    // upper = if (!B0 && B1)
-
-    public Indexing(OI oi, Intake intake) {
+    public Indexing(OI oi, Intake intake, Shooter shooter) {
 
         this.oi = oi;
         this.intake = intake;
+        this.shooter = shooter;
 
         funnelMotor = new TalonSRX(RobotMap.FUNNEL_MOTOR_CANID);
         lowerFunnelSideIndex = new TalonSRX(
@@ -68,92 +67,102 @@ public class Indexing {
         bannerPos4 = new DigitalInput(4);
     }
 
-    public void indexPeriodic() {
-        updateBallPoitions();
+    /**
+     * Runs periodically to control the index
+     */
+    public void indexManualControls() {
 
-        if (oi.getGamepadPOV() != -1) {
+        // Gets joystick values
+        double leftGamepadStick = -oi.getGamepadAxis(RobotMap.GP_L_Y_AXIS);
+        double rightGamepadStick = -oi.getGamepadAxis(RobotMap.GP_R_Y_AXIS);
 
-            if (oi.getGamepadPOV() == 0) {
-                runFunnel(.5);
-                runLowerFunnelSideIndex(.5);
-                runLowerFarSideIndex(.5);
-                runUpperBelt(.5);
-                runLoadBelt(.5);
-            }
+        // If the joystick value is outside the deadzone
+        if (Math.abs(leftGamepadStick) > RobotMap.JOYSTICK_DEADZONE) {
 
-            else if (oi.getGamepadPOV() == 180) {
-                runFunnel(-0.5);
-                runLowerFunnelSideIndex(-0.5);
-                runLowerFarSideIndex(-0.5);
-                runUpperBelt(-0.5);
-                runLoadBelt(-0.50);
-            }
-            else if (oi.getGamepadButton(RobotMap.Y_BUTTON)) {
-                runLowerFunnelSideIndex(.5);
-                runLowerFarSideIndex(.5);
-            }
-            else if (oi.getGamepadButton(RobotMap.X_BUTTON)) {
-                runUpperBelt(0.5);
-                runLoadBelt(0.50);
-            }
+            // Scales the value
+            leftGamepadStick = (Math.abs(leftGamepadStick) - RobotMap.JOYSTICK_DEADZONE)
+                    * (1 / (1 - RobotMap.JOYSTICK_DEADZONE))
+                    * Math.signum(leftGamepadStick) * RobotMap.INDEX_MAX_SPEED;
+
+            // Runs the motors
+            runFunnel(leftGamepadStick);
+            runLowerFarSideIndex(leftGamepadStick);
+            runLowerFunnelSideIndex(leftGamepadStick);
+
+            autoLower = false;
+            
         }
 
-        if (oi.getGamepadButton(RobotMap.Y_BUTTON)) {
-            runLoadBelt(0.5);
-            runUpperBelt(0.5);
-        }
-        else if (oi.getGamepadButton(RobotMap.B_BUTTON)) {
-            runUpperBelt(-0.5);
-            runLoadBelt(-0.50);
-        }
+        // Otherwise stop motors
         else {
-            runUpperBelt(0.0);
-            runLoadBelt(0.0);
-        }
 
-        if (oi.getGamepadButton(RobotMap.X_BUTTON)) {
-            runLowerFarSideIndex(0.5);
-            runLowerFunnelSideIndex(0.5);
-        }
-        else if (oi.getGamepadButton(RobotMap.A_BUTTON)) {
-            runLowerFarSideIndex(-0.5);
-            runLowerFunnelSideIndex(-0.50);
-        }
-        else {
+            runFunnel(0.0);
             runLowerFarSideIndex(0.0);
-            runLowerFunnelSideIndex(0.0);
+            runLowerFunnelSideIndex(0.0);            
+
+            autoLower = true;
+
         }
-        
+
+        // If the joystick value is outside the deadzone
+        if (Math.abs(rightGamepadStick) > RobotMap.JOYSTICK_DEADZONE) {
+
+            // Scales the value
+            rightGamepadStick = (Math.abs(rightGamepadStick) - RobotMap.JOYSTICK_DEADZONE)
+                    * (1 / (1 - RobotMap.JOYSTICK_DEADZONE))
+                    * Math.signum(rightGamepadStick) * RobotMap.INDEX_MAX_SPEED;
+
+            // Runs the motors
+            runLoadBelt(rightGamepadStick);
+            runUpperBelt(rightGamepadStick);
+
+            autoUpper = false;
+
+        }
+
+        // Otherwise stop motors
+        else {
+
+            runLoadBelt(0.0);
+            runUpperBelt(0.0);
+            
+            autoUpper = true;
+
+        }
+
+        if (autoLower && autoUpper) {
+            bringToTop();
+        }
+
     }
 
+    /**
+     * Brings all of the balls in the index to the top of the indexer to be
+     * ready to fire.
+     */
     public void bringToTop() {
 
         boolean[] banners = updateBallPoitions();
 
-        if (banners[4] || intake.isRunning()) {
-            runFunnel(0.5);
-        }
-        else {
-            runFunnel(0.0);
-        }
-
         if ((!banners[0] && banners[1]) || (!banners[1] && banners[2])
                 || (!banners[2] && banners[3])) {
-            runLowerFarSideIndex(0.5);
-            runLowerFunnelSideIndex(0.5);
+            runLowerFarSideIndex(RobotMap.INDEX_MAX_SPEED);
+            runLowerFunnelSideIndex(RobotMap.INDEX_MAX_SPEED);
+            runFunnel(RobotMap.INDEX_MAX_SPEED);
         }
         else {
             runLowerFarSideIndex(0.0);
             runLowerFunnelSideIndex(0.0);
+            runFunnel(0.0);
         }
 
         if (!banners[0] && banners[1]) {
-            runUpperBelt(0.5);
-            runLoadBelt(0.5);
+            runUpperBelt(RobotMap.INDEX_MAX_SPEED);
+            runLoadBelt(RobotMap.INDEX_MAX_SPEED);
         }
         else {
             runUpperBelt(0.0);
-            //runLoadBelt(0.0);
+            runLoadBelt(0.0);
         }
     }
 
@@ -208,12 +217,32 @@ public class Indexing {
         return ballsInRobot;
     }
 
+    /**
+     * Check to where in the index balls are.
+     * 
+     * @return A boolean array where each index matches the index of the ball.
+     *         True if there is a ball in that index.
+     */
     public boolean[] updateBallPoitions() {
-        ballInPos0 = bannerPos0.get();
-        ballInPos1 = bannerPos1.get();
-        ballInPos2 = bannerPos2.get();
-        ballInPos3 = bannerPos3.get();
-        ballInPos4 = !bannerPos4.get();
+        // If there was not a ball in position 0 or the shooter is able to fire,
+        // update position 0
+        if (!ballInPos0 || shooter.readyToFire()) ballInPos0 = bannerPos0.get();
+
+        // If there was not a ball in position 1 or position 0 is empty, update
+        // position
+        if (!ballInPos1 || ballInPos0) ballInPos1 = bannerPos1.get();
+
+        // If there was not a ball in position 2 or position 1 is empty, update
+        // position
+        if (!ballInPos2 || ballInPos1) ballInPos2 = bannerPos2.get();
+
+        // If there was not a ball in position 3 or position 3 is empty, update
+        // position
+        if (!ballInPos3 || ballInPos2) ballInPos3 = bannerPos3.get();
+
+        // If there was not a ball in position 4 or position 3 is empty, update
+        // position
+        if (!ballInPos4 || ballInPos3) ballInPos4 = !bannerPos4.get();
 
         SmartDashboard.putBoolean("ball 0", bannerPos0.get());
         SmartDashboard.putBoolean("ball 1", ballInPos1);
@@ -225,22 +254,47 @@ public class Indexing {
                 ballInPos4 };
     }
 
+    /**
+     * Runs the funnel motor.
+     * 
+     * @param speed Percent output for the motor.
+     */
     private void runFunnel(double speed) {
         funnelMotor.set(ControlMode.PercentOutput, speed);
     }
 
+    /**
+     * Runs the lower belts on the funnel side of the index.
+     * 
+     * @param speed Percent output for the motor.
+     */
     private void runLowerFunnelSideIndex(double speed) {
         lowerFunnelSideIndex.set(ControlMode.PercentOutput, speed);
     }
 
+    /**
+     * Runs the lower belts on the side opposite the funnel on the index.
+     * 
+     * @param speed Percent output for the motor.
+     */
     private void runLowerFarSideIndex(double speed) {
         lowerFarSideIndex.set(ControlMode.PercentOutput, speed);
     }
 
+    /**
+     * Runs the upper belts without the loading wheel.
+     * 
+     * @param speed Percent output for the motor.
+     */
     private void runUpperBelt(double speed) {
         upperBeltIndex.set(speed);
     }
 
+    /**
+     * Runs the upper belts with the loading wheel.
+     * 
+     * @param speed Percent output for the motor.
+     */
     private void runLoadBelt(double speed) {
         loadingBeltIndex.set(speed);
     }

@@ -20,8 +20,10 @@ public class UDPReceiver implements Runnable {
     // declare objects for receiving data
     DatagramSocket socket;
     DatagramPacket dat;
-    byte[] receiveData = new byte[24]; // data should be 4 floats in
+    byte[] receiveData = new byte[24]; // data should be 6 floats in
                                        // length
+    final Float ERROR = 2f;
+
     // data values from the Jetson
     float xValue;
     float yValue;
@@ -36,7 +38,6 @@ public class UDPReceiver implements Runnable {
             // open a datagram socket to receive messages
             // should be a different port than the sender
             socket = new DatagramSocket(RobotMap.RECEIVER_SOCKET);
-            socket.setSoTimeout(1);
 
             // create a datagram packet to receive data of a certain length
             dat = new DatagramPacket(receiveData, receiveData.length);
@@ -62,8 +63,8 @@ public class UDPReceiver implements Runnable {
             roll = bbuf.getFloat(12);
             pitch = bbuf.getFloat(16);
             heading = bbuf.getFloat(20);
-            // heading = Math.atan2((double) XValue, (double) YValue) *
-            // (180/Math.PI);
+            double cHeading = Math.atan2((double) xValue, (double) yValue) *
+            (180/Math.PI);
 
             SmartDashboard.putNumber("X Value", (double) xValue);
             SmartDashboard.putNumber("Y Value", (double) yValue);
@@ -71,7 +72,7 @@ public class UDPReceiver implements Runnable {
             SmartDashboard.putNumber("Roll", (double) roll);
             SmartDashboard.putNumber("Pitch", (double) pitch);
             SmartDashboard.putNumber("Yaw", (double) heading);
-            // SmartDashboard.putNumber("line heading", (double) heading);
+            SmartDashboard.putNumber("Camera Heading", cHeading);
             if ((int) xValue != -99 && (int) yValue != -99
                     && (int) zValue != -99) {
 
