@@ -110,6 +110,7 @@ public class RobotMap {
 
     public static final double INDEX_MAX_SPEED = 0.5;
 
-    public static final double TURRET_CLICKS_PER_DEGREE = 225;
+    public static final double TURRET_CLICKS_PER_DEGREE = 225.0;
+    public static final double TURRET_ANGLE_TOLERANCE = 0.5;
 
 }

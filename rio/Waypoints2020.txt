@@ -27,5 +27,5 @@ AllianceTargetZone:247,729,84,0,0,0
 EnemyTargetZone:113,159,84,0,0,0
 AllianceLoadingStationCenter:241,159,24,0,0,0
 EnemyLoadingStationCenter:119,729,24,0,0,0
-TwoFootTestPoint:0,24,0,0,0,0
+TwoFootTestPoint:0,60,0,0,0,0
 TwoFootNegTestPoint:0,-24,0,0,0,0

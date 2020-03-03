@@ -20,6 +20,7 @@ public class Commander {
     private Intake intake;
     private Indexing index;
     private Shooter shooter;
+    private Turret turret;
 
     private int counter = 0;
     private int instructionCounter = 0;
@@ -28,7 +29,7 @@ public class Commander {
 
     Commander(Scenario scenario, WaypointMap waypoints, DeadReckoning location,
             WaypointTravel guidance, Intake intake, Indexing index,
-            Shooter shooter) {
+            Shooter shooter, Turret turret) {
         this.scenario = scenario;
         this.waypoints = waypoints;
 
@@ -39,6 +40,7 @@ public class Commander {
         this.intake = intake;
         this.index = index;
         this.shooter = shooter;
+        this.turret = turret;
     }
 
     public void periodic() {
@@ -141,6 +143,13 @@ public class Commander {
                                 isDone = true;
                             }
     
+                            break;
+                        case "turret":
+                            if (currentArgs[0].equalsIgnoreCase("rotateTo")) {
+                                if (turret.setAngle(Double.parseDouble(currentArgs[1]))) {
+                                    isDone = true;
+                                }
+                            }
                             break;
                         default:
                             isDone = true;

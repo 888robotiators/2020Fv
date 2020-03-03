@@ -12,6 +12,8 @@ public class Turret {
 
     OI oi;
 
+    double turretAngle;
+
     int encoderCount;
 
     boolean leftLimitSwitch = false;
@@ -19,20 +21,19 @@ public class Turret {
 
     public Turret(OI oi) {
 
+        this.oi = oi;
+
         turretMotor = new TalonSRX(RobotMap.TURRET_CANID);
         turretMotor.setInverted(true);
 
         turretMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
         turretMotor.setSelectedSensorPosition(0);
-
-        this.oi = oi;
+        turretAngle = -30;
     }
 
     public void turretTeleopPeriodic() {
 
         double input = oi.getRightStickAxis(RobotMap.JOYSTICK_3D_Z_AXIS);
-
-        encoderCount = -turretMotor.getSelectedSensorPosition();
 
         if (oi.getRightStickButton(RobotMap.JOYSTICK_3D_THUMB_BUTTON)
                 && Math.abs(input) > 0.1) {
@@ -48,6 +49,19 @@ public class Turret {
     }
 
     public boolean setAngle(double angle) {
+        if (Math.abs(turretAngle - angle) < RobotMap.TURRET_ANGLE_TOLERANCE) {
+            turnTurretMotor(0.0);
+            return true;
+        }
+
+        if (turretAngle > angle) {
+            turnTurretMotor(-1.0);
+        }
+
+        if (turretAngle < angle) {
+            turnTurretMotor(1.0);
+        }
+
         return false;
     }
 
@@ -55,6 +69,8 @@ public class Turret {
 
         leftLimitSwitch = turretMotor.isFwdLimitSwitchClosed() == 1;
         rightLimitSwitch = turretMotor.isRevLimitSwitchClosed() == 1;
+
+        encoderCount = -turretMotor.getSelectedSensorPosition();
 
         SmartDashboard.putBoolean("Turret Left Limit", leftLimitSwitch);
         SmartDashboard.putBoolean("Turret Right Limit", rightLimitSwitch);
@@ -73,6 +89,10 @@ public class Turret {
         if (leftLimitSwitch) {
             turretMotor.setSelectedSensorPosition(-6750);
         }
+
+        turretAngle = encoderCount / RobotMap.TURRET_CLICKS_PER_DEGREE;
+        SmartDashboard.putNumber("Turret angle", turretAngle);
+        
     }
 
 }

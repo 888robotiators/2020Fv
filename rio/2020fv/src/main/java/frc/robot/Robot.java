@@ -95,7 +95,7 @@ public class Robot extends TimedRobot {
         compressor = new Compressor(RobotMap.PCM);
 
         auto = new Commander(autoScenario, map, location, guidence, intake,
-                index, shooter);
+                index, shooter, turret);
 
     }
 
