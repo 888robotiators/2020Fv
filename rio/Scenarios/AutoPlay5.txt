@@ -1,3 +1,4 @@
-##name=AutoPlay5
+##name=test
+shooter.spin,2750
 command.wait,5
 shooter.shoot,2750
