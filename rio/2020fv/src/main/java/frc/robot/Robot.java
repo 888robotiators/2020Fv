@@ -9,17 +9,15 @@ package frc.robot;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
-
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Command;
-
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.text.BreakIterator;
 
 import disc.data.Scenario;
 import disc.data.WaypointMap;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -39,7 +37,6 @@ public class Robot extends TimedRobot {
     OI oi;
     Shooter shooter;
     Turret turret;
-    JetsonLight jetsonLight;
 
     DeadReckoning location;
 
@@ -51,8 +48,7 @@ public class Robot extends TimedRobot {
 
     UsbCamera camera0;
     UsbCamera camera1;
-    
-    SendableChooser autoChooser;
+
     Scenario autoScenario;
     Commander auto;
 
@@ -62,48 +58,43 @@ public class Robot extends TimedRobot {
     boolean done = false;
 
     int delay;
-    int counter = 0;
+    int counter ;
+
+    boolean timeToMove;
 
     @Override
     public void robotInit() {
 
         try {
             map = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
-            autoScenario = new Scenario(new File("/home/lvuser/TestAuto.txt"));
+            autoScenario = new Scenario(new File("/home/lvuser/AutoPlay5.txt"));
             SmartDashboard.putBoolean("Suicide", false);
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
             SmartDashboard.putBoolean("Suicide", true);
-        }
+        } 
 
+        receive = new UDPReceiver();
         oi = new OI();
         drive = new DriveTrain();
         intake = new Intake(oi);
-        index = new Indexing(oi, intake);
+        shooter = new Shooter(oi, location, turret, map, receive);
+        index = new Indexing(oi, intake, shooter);
         climb = new Climber(oi);
         turret = new Turret(oi);
 
         imu = new IMU();
         send = new UDPSender();
-        receive = new UDPReceiver();
         location = new DeadReckoning(drive, imu, receive, map);
         guidence = new WaypointTravel(drive, location);
         nav = new Navigation(oi, drive, guidence);
-        jetsonLight = new JetsonLight(oi);
 
         camera0 = CameraServer.getInstance().startAutomaticCapture(0);
         camera1 = CameraServer.getInstance().startAutomaticCapture(1);
 
-
-        shooter = new Shooter(oi, location, index, turret, map);
-
         compressor = new Compressor(RobotMap.PCM);
 
-        autoChooser = new SendableChooser<>();
-        autoChooser.addDefault("Default Auto", null);
-        autoChooser.addObject("Auto Scenario 2", null);
-        SmartDashboard.putData("Auto Scenarios", autoChooser);
         auto = new Commander(autoScenario, map, location, guidence, intake,
                 index, shooter);
 
@@ -111,15 +102,36 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        location.reset();
+        drive.resetEncoderOffset();
+        counter = 0;
+        
     }
 
     @Override
     public void autonomousPeriodic() {
-        location.updateTracker();
-        location.updateDashboard();
         index.updateBallPoitions();
-        auto.periodic();
+        index.bringToTop();
+        shooter.setShooterOutputVelocity(RobotMap.RPM_WHITELINE);
+        //turret.turnTurretMotorAngle(10);
+        //if(shooter.readyToFire()) {
+        if(shooter.getRPMs() > RobotMap.RPM_WHITELINE - 50) {
+            index.loadShooter();
+        }
+        
+        else{ index.stopIndexer();}
+        if(counter > 5 * 50) {
+            shooter.stop();
+            index.stopIndexer();
+            if((drive.getEncoders()[0] < RobotMap.CLICKS_PER_INCH * 147)) {
+                drive.move(-0.35, -0.35);
+            }
+            else {
+               drive.move(0,0);
+               drive.brake();
+            }
+        }
+
+        counter++;
 
     }
 
@@ -127,21 +139,21 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         compressor.setClosedLoopControl(true);
         location.reset();
-        // send.sendMessage();
+        send.sendMessage();
+        drive.coast();
     }
 
     @Override
     public void teleopPeriodic() {
-        // receive.run();
+        //receive.run();
         location.updateTracker();
         location.updateDashboard();
         nav.navTeleopPeriodic();
         climb.climberTeleopPeriodic();
         intake.intakeTeleopPeriodic();
-        index.indexPeriodic();
+        index.indexManualControls();
         shooter.shooterTeleopPeriodic();
         turret.turretTeleopPeriodic();
-        jetsonLight.jetsonLightPeriodic();
     }
 
     @Override

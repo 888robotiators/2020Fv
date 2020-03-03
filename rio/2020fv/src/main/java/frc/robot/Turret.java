@@ -13,6 +13,8 @@ public class Turret {
 
     Counter encoder;
 
+    double turretAngle;
+
     OI oi;
 
     public Turret(OI oi) {

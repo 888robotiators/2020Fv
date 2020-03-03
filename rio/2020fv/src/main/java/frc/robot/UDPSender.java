@@ -15,7 +15,6 @@ public class UDPSender extends Thread {
     public static DatagramSocket sock;
     DatagramPacket message;
     InetAddress jetsonAddress;
-    UDPReceiver receive;
 
     int cycle = 0;
 
