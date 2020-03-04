@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.BreakIterator;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 import disc.data.Scenario;
 import disc.data.WaypointMap;
@@ -61,6 +62,8 @@ public class Robot extends TimedRobot {
     int counter ;
 
     boolean timeToMove;
+    boolean driveThere = false;
+    boolean donePush = false;
 
     @Override
     public void robotInit() {
@@ -104,33 +107,73 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         drive.resetEncoderOffset();
         counter = 0;
+        compressor.setClosedLoopControl(true);
+        imu.resetHeading();
         
     }
 
     @Override
     public void autonomousPeriodic() {
-        index.updateBallPoitions();
-        index.bringToTop();
-        shooter.setShooterOutputVelocity(RobotMap.RPM_WHITELINE);
-        //turret.turnTurretMotorAngle(10);
-        //if(shooter.readyToFire()) {
-        if(shooter.getRPMs() > RobotMap.RPM_WHITELINE - 50) {
-            index.loadShooter();
-        }
-        
-        else{ index.stopIndexer();}
-        if(counter > 5 * 50) {
-            shooter.stop();
-            index.stopIndexer();
-            if((drive.getEncoders()[0] < RobotMap.CLICKS_PER_INCH * 147)) {
-                drive.move(-0.35, -0.35);
+        if(!donePush) {
+            if(drive.getEncoders()[0] < RobotMap.CLICKS_PER_INCH * 30) {
+                drive.move(0.2,0.2);
             }
             else {
-               drive.move(0,0);
-               drive.brake();
+                drive.move(0,0);
+                donePush = true;
+                drive.resetEncoderOffset();
             }
         }
+        if(donePush) {
+            index.updateBallPoitions();
+            index.bringToTop();
+            shooter.setShooterOutputVelocity(RobotMap.RPM_WHITELINE);
+            //turret.turnTurretMotorAngle(10);
+            //if(shooter.readyToFire()) {
+            if(shooter.getRPMs() > RobotMap.RPM_WHITELINE - 50) {
+                index.loadShooter();
+            }
+            
+            else{ index.stopIndexer();}
+            if(!index.hasBalls() && counter > 3 * 50) {
+                intake.getFlipper().set(DoubleSolenoid.Value.kReverse);
+                intake.intakeIn();
+                if(!driveThere) {
+                    if((drive.getEncoders()[0] < RobotMap.CLICKS_PER_INCH * 147)) {
+                        if(imu.getHeading() > 0) {
+                            drive.move(0.2,0.21);
+                        } else if (imu.getHeading() < 0) {
+                            drive.move(0.21,0.2);
+                        }
+                        shooter.stop();
+                        index.stopIndexer();
+                    }
+                    else {
+                        drive.move(0,0);
+                        drive.brake();
+                        driveThere = true;
+                        drive.resetEncoderOffset();
+                        imu.resetHeading();
+                        shooter.stop();
+                        index.stopIndexer();
+                    }
+                }
 
+                if(driveThere) {
+                    intake.intakeStop();
+                    intake.getFlipper().set(DoubleSolenoid.Value.kForward);
+                    if(drive.getEncoders()[0] > -RobotMap.CLICKS_PER_INCH * 147) {
+                        drive.move(0.3, 0.3);
+                        shooter.stop();
+                        index.stopIndexer();
+                    }
+                    else {
+                        drive.move(0.0, 0.0);
+                    }
+                }
+
+            }
+    }
         counter++;
 
     }

@@ -28,7 +28,10 @@ public class Intake {
 
         //intakeIn();
     }
-
+    
+    public DoubleSolenoid getFlipper() {
+        return intakeFlipper;
+    }
     /**
      * Teleop controls for the intake.
      */
