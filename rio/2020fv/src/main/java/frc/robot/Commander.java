@@ -25,6 +25,8 @@ public class Commander {
     private int counter = 0;
     private int instructionCounter = 0;
 
+    private boolean indexRun = false;
+
     private boolean isDone = true;
 
     Commander(Scenario scenario, WaypointMap waypoints, DeadReckoning location,
@@ -56,6 +58,7 @@ public class Commander {
         }
 
         SmartDashboard.putNumber("instruction", instructionCounter);
+        SmartDashboard.putBoolean("Done auto", current == null);
 
         if (current != null) {
 
@@ -94,9 +97,12 @@ public class Commander {
                             if (currentArgs[0].equalsIgnoreCase("shoot")) {
                                 if (index.hasBalls()) {
                                     index.bringToTop();
-                                    shooter.setShooterOutputVelocity(Integer.parseInt(currentArgs[1]));
+                                    shooter.setShooterOutputVelocity(Double.parseDouble(currentArgs[1]));
                                     if (shooter.readyToFire()) {
                                         index.loadShooter();
+                                    }
+                                    else {
+                                        index.stopIndexer();
                                     }
                                 }
                                 else {
@@ -151,6 +157,16 @@ public class Commander {
                                 }
                             }
                             break;
+                        case "index":
+                            if (currentArgs[0].equalsIgnoreCase("start")) {
+                                indexRun = true;
+                                isDone = true;
+                            }
+                            if (currentArgs[0].equalsIgnoreCase("stop")) {
+                                indexRun = false;
+                                isDone = true;
+                            }
+                            break;
                         default:
                             isDone = true;
                             break;
@@ -161,6 +177,10 @@ public class Commander {
                 case CONTROL_STATE:
                     isDone = true;
                     break;
+            }
+
+            if (indexRun) {
+                index.bringToTop();
             }
 
         }

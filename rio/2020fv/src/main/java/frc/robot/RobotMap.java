@@ -97,7 +97,7 @@ public class RobotMap {
 
     public static final int TURRET_ENCODER_CHANNEL = 9;
 
-    public static final int SHOOTER_RPM_TOLERANCE = 100;
+    public static final int SHOOTER_RPM_TOLERANCE = 50;
 
     public static final double RPM_WHITELINE = 2750;
     public static final double RPM_COLORWHEEL = 3800;

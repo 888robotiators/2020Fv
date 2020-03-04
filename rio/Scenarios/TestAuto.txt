@@ -1,8 +1,12 @@
 ##name=test
 shooter.spin,2750
-turret.rotateTo,-22.5
+turret.rotateTo,-24
 shooter.shoot,2750
 intake.intakeDown
 intake.intakeRun
-nav.goto,LastBall,0.15
-shooter.shoot,3250
+shooter.spin,3025
+index.start
+nav.goto,LastBall,0.2
+turret.rotateTo,-9.5
+index.stop
+shooter.shoot,3025
