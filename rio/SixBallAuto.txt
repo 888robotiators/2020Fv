@@ -1,0 +1,16 @@
+##name=test
+shooter.spin,2750
+turret.rotateTo,-24
+index.start
+shooter.shoot,2750,3
+intake.intakeDown
+#index.stop
+intake.intakeRun
+turret.rotateTo,-10.0
+shooter.spin,3000
+index.start
+nav.goto,LastBall,0.25
+#index.stop
+shooter.shoot,3000,3.5
+turret.rotateTo,0
+timeMove.back,3,0.25

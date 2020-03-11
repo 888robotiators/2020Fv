@@ -67,7 +67,8 @@ public class Robot extends TimedRobot {
     boolean timeToMove = false;
 
     String joshAutoSucks = "/home/lvuser/JoshAutoSucks.txt";
-    String charlieAutoGood = "/home/lvuser/TestAuto.txt";
+    String charlieAutoGood = "/home/lvuser/SixBallAuto.txt";
+    String pushyAuto = "/home/lvuser/SixBallPushyBoi.txt";
     String domCode = "/home/lvuser/DomSomething.txt";
 
     // Changes made 3.9.20
@@ -93,7 +94,7 @@ public class Robot extends TimedRobot {
 
         try {
             map = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
-            autoScenario = new Scenario(new File(charlieAutoGood));
+            autoScenario = new Scenario(new File(pushyAuto));
             SmartDashboard.putBoolean("File not found", false);
         }
         catch (FileNotFoundException e) {

@@ -113,8 +113,10 @@ public class Navigation {
         reverseButton = oi.getLeftStickButton(RobotMap.JOYSTICK_BOTTOM_BUTTON)
                 || oi.getRightStickButton(RobotMap.JOYSTICK_BOTTOM_BUTTON);
 
-        double leftInput = reverse ? -rightStickValue : leftStickValue;
-        double rightInput = reverse ? -leftStickValue : rightStickValue;
+        double leftInput = //reverse ? -rightStickValue : 
+        -leftStickValue;
+        double rightInput = //reverse ? -leftStickValue : 
+        -rightStickValue;
 
         // Sends values to drive train.
         if (Math.abs(leftStickValue) > RobotMap.JOYSTICK_DEADZONE

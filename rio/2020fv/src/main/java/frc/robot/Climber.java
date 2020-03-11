@@ -39,15 +39,15 @@ public class Climber {
         if(oi.getGamepadAxis(RobotMap.GP_R_TRIGGER) > 0.1 
         || oi.getGamepadAxis(RobotMap.GP_L_TRIGGER) > 0.1 ) {
             if (oi.getGamepadAxis(RobotMap.GP_R_TRIGGER) > 0.1 && readyToClimb()) {
-                unlock();
-                climberMotor.set(ControlMode.PercentOutput,
-                    -oi.getGamepadAxis(RobotMap.GP_R_TRIGGER));
+                if(lock.get().equals(isUnlocked)) {
+                    climberMotor.set(ControlMode.PercentOutput,
+                        -oi.getGamepadAxis(RobotMap.GP_R_TRIGGER));
                 }
             }
             else if (oi.getGamepadAxis(RobotMap.GP_L_TRIGGER) > 0.1 && readyToClimb()) {
-                unlock();
-                climberMotor.set(ControlMode.PercentOutput,
-                    oi.getGamepadAxis(RobotMap.GP_L_TRIGGER));
+                if(lock.get().equals(isUnlocked)) {
+                    climberMotor.set(ControlMode.PercentOutput,
+                        oi.getGamepadAxis(RobotMap.GP_L_TRIGGER));
                 }
             }
             else {

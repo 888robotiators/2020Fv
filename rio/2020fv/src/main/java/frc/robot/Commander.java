@@ -98,7 +98,7 @@ public class Commander {
                         case "shooter": //shooter stuff: shoot - shoots balls, rpms, timeout  
                                         //               spin - spins the shooter, rpms
                             if (currentArgs[0].equalsIgnoreCase("shoot")) {
-                                if (index.hasBalls() && counter < Integer.parseInt(currentArgs[2]) * 50) {
+                                if (index.hasBalls() && counter < Double.parseDouble(currentArgs[2]) * 50) {
                                     counter++;
                                     index.bringToTop();
                                     shooter.setShooterOutputVelocity(Double.parseDouble(currentArgs[1]));
@@ -175,8 +175,8 @@ public class Commander {
                         case "moveStraight": //Clicks per inch move straight forward or backwards inputted speed and distance
                                             //distance (inch), speed (%output)
                             if(currentArgs[0].equalsIgnoreCase("back")) {
-                                if (drive.getEncoders()[1] > -RobotMap.CLICKS_PER_INCH * Integer.parseInt(currentArgs[1])) {
-                                        drive.move(-Double.parseDouble(currentArgs[2]), -Double.parseDouble(currentArgs[2]));
+                                if (drive.getEncoders()[1] > -RobotMap.CLICKS_PER_INCH * Double.parseDouble(currentArgs[1])) {
+                                        drive.move(Double.parseDouble(currentArgs[2]), Double.parseDouble(currentArgs[2]));
                                     }
                                 else { 
                                     drive.move(0,0);
@@ -185,8 +185,8 @@ public class Commander {
                                 }
                             }
                             else if(currentArgs[0].equals("forward")) {
-                                if (drive.getEncoders()[1] < RobotMap.CLICKS_PER_INCH * Integer.parseInt(currentArgs[1])) {
-                                    drive.move(Double.parseDouble(currentArgs[2]), Double.parseDouble(currentArgs[2]));
+                                if (drive.getEncoders()[1] < RobotMap.CLICKS_PER_INCH * Double.parseDouble(currentArgs[1])) {
+                                    drive.move(-Double.parseDouble(currentArgs[2]), -Double.parseDouble(currentArgs[2]));
                                 }
                                 else { 
                                     drive.move(0,0);
@@ -196,6 +196,32 @@ public class Commander {
                             }
 
                             break;
+                        case "timeMove":
+                            //direction, time, sPEED
+                            if(currentArgs[0].equalsIgnoreCase("back")) {
+                                if (counter < Double.parseDouble(currentArgs[1]) * 50) {
+                                    drive.move(Double.parseDouble(currentArgs[2]),Double.parseDouble(currentArgs[2]));
+                                    counter++;
+                                }
+                                else {
+                                    drive.move(0,0);
+                                    counter = 0;
+                                    isDone = true;
+                                }
+                            }
+                            else if(currentArgs[0].equals("forward")) {
+                                if (counter < Double.parseDouble(currentArgs[1]) * 50) {
+                                    drive.move(-Double.parseDouble(currentArgs[2]),-Double.parseDouble(currentArgs[2]));
+                                    counter++;
+                                }
+                                else {
+                                    drive.move(0,0);
+                                    counter = 0;
+                                    isDone = true;
+                                }
+                            }
+                            
+                            break;                            
                         default:
                             isDone = true;
                             break;
