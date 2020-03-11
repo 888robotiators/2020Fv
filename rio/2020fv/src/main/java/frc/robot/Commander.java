@@ -6,7 +6,7 @@ import disc.data.Instruction;
 import disc.data.Scenario;
 import disc.data.WaypointMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+//
 public class Commander {
 
     private Scenario scenario;
@@ -20,15 +20,19 @@ public class Commander {
     private Intake intake;
     private Indexing index;
     private Shooter shooter;
+    private Turret turret;
+    private DriveTrain drive;
 
     private int counter = 0;
     private int instructionCounter = 0;
+
+    private boolean indexRun = false;
 
     private boolean isDone = true;
 
     Commander(Scenario scenario, WaypointMap waypoints, DeadReckoning location,
             WaypointTravel guidance, Intake intake, Indexing index,
-            Shooter shooter) {
+            Shooter shooter, Turret turret, DriveTrain drive) {
         this.scenario = scenario;
         this.waypoints = waypoints;
 
@@ -39,10 +43,12 @@ public class Commander {
         this.intake = intake;
         this.index = index;
         this.shooter = shooter;
+        this.turret = turret;
+        this.drive = drive;
     }
 
     public void periodic() {
-        if (isDone) {
+        if (isDone) { //remove the first item in the queue if the action is done
             isDone = false;
             if (!queue.isEmpty()) {
                 current = queue.remove();
@@ -54,6 +60,7 @@ public class Commander {
         }
 
         SmartDashboard.putNumber("instruction", instructionCounter);
+        SmartDashboard.putBoolean("Done auto", current == null);
 
         if (current != null) {
 
@@ -61,7 +68,7 @@ public class Commander {
 
             switch (current.getT()) {
 
-                case DELIMITER:
+                case DELIMITER://start and stop the code (not used) 
 
                     if (currentArgs[0].equalsIgnoreCase("start")) {
                         // start up code for scenario
@@ -73,10 +80,10 @@ public class Commander {
 
                     break;
 
-                case COMMAND:
+                case COMMAND: 
 
                     switch (current.getTarget()) {
-                        case "nav":
+                        case "nav": //waypoint travel to inputted waypoint at speed 
 
                             if (currentArgs[0].equalsIgnoreCase("goTo")) {
                                 if (guidance.goToWaypoint(
@@ -88,31 +95,39 @@ public class Commander {
 
                             break;
 
-                        case "shooter":
+                        case "shooter": //shooter stuff: shoot - shoots balls, rpms, timeout  
+                                        //               spin - spins the shooter, rpms
                             if (currentArgs[0].equalsIgnoreCase("shoot")) {
-                                if (index.hasBalls()) {
+                                if (index.hasBalls() && counter < Integer.parseInt(currentArgs[2]) * 50) {
+                                    counter++;
                                     index.bringToTop();
-                                    shooter.setShooterOutputVelocity(Integer.parseInt(currentArgs[1]));
+                                    shooter.setShooterOutputVelocity(Double.parseDouble(currentArgs[1]));
                                     if (shooter.readyToFire()) {
                                         index.loadShooter();
                                     }
+                                    else {
+                                        index.stopLoadShooter();
+                                    }
                                 }
                                 else {
+                                    counter = 0;
+                                    shooter.stop();
+                                    index.stopIndexer();
                                     isDone = true;
-                                }
+                                }  
+                            }
+                            if (currentArgs[0].equalsIgnoreCase("spin")) {
+                                shooter.setShooterOutputVelocity(Integer.parseInt(currentArgs[1]));
+                                isDone = true;
                             }
                             break;
-                        case "intake":
+                        case "intake": //Controll intake position and speed
                             if (currentArgs[0].equalsIgnoreCase("intakeDown")) {
-                                intake.flipDown();
+                                intake.flipIntake(true);
                                 isDone = true;
                             }
                             if (currentArgs[0].equalsIgnoreCase("intakeUp")) {
                                 intake.flipUp();
-                                isDone = true;
-                            }
-                            if (currentArgs[0].equalsIgnoreCase("intakeRun")) {
-                                intake.intakeIn();
                                 isDone = true;
                             }
                             if (currentArgs[0].equalsIgnoreCase("intakeRun")) {
@@ -124,7 +139,24 @@ public class Commander {
                                 isDone = true;
                             }
                             break;
-                        case "command":
+                        case "turret": //tells the turret to rotate to inputted degree 
+                            if (currentArgs[0].equalsIgnoreCase("rotateTo")) {
+                                if (turret.setAngle(Double.parseDouble(currentArgs[1]))) {
+                                    isDone = true;
+                                }
+                            }
+                            break;
+                        case "index": //full index on no smarts 
+                            if (currentArgs[0].equalsIgnoreCase("start")) {
+                                indexRun = true;
+                                isDone = true;
+                            }
+                            if (currentArgs[0].equalsIgnoreCase("stop")) {
+                                indexRun = false;
+                                isDone = true;
+                            }
+                            break;
+                        case "command": //waits inputted seconds
                             if (currentArgs[0].equalsIgnoreCase("wait")) {
                                 if (counter < Integer.parseInt(currentArgs[1]) * 50) {
                                     counter++;
@@ -140,6 +172,30 @@ public class Commander {
                             }
     
                             break;
+                        case "moveStraight": //Clicks per inch move straight forward or backwards inputted speed and distance
+                                            //distance (inch), speed (%output)
+                            if(currentArgs[0].equalsIgnoreCase("back")) {
+                                if (drive.getEncoders()[1] > -RobotMap.CLICKS_PER_INCH * Integer.parseInt(currentArgs[1])) {
+                                        drive.move(-Double.parseDouble(currentArgs[2]), -Double.parseDouble(currentArgs[2]));
+                                    }
+                                else { 
+                                    drive.move(0,0);
+                                    drive.resetEncoderOffset();
+                                    isDone = true;
+                                }
+                            }
+                            else if(currentArgs[0].equals("forward")) {
+                                if (drive.getEncoders()[1] < RobotMap.CLICKS_PER_INCH * Integer.parseInt(currentArgs[1])) {
+                                    drive.move(Double.parseDouble(currentArgs[2]), Double.parseDouble(currentArgs[2]));
+                                }
+                                else { 
+                                    drive.move(0,0);
+                                    drive.resetEncoderOffset();
+                                    isDone = true;
+                                }
+                            }
+
+                            break;
                         default:
                             isDone = true;
                             break;
@@ -151,6 +207,12 @@ public class Commander {
                     isDone = true;
                     break;
             }
+
+            if (indexRun) {
+                index.bringToTop();
+            }
+
+            SmartDashboard.putNumber("Encoder RPMs", shooter.getRPMs());
 
         }
 

@@ -40,14 +40,11 @@ public class WaypointTravel {
      */
     public boolean goToWaypoint(Waypoint destination, double speed) {
 
-        double desiredX = 48;
-        destination.getX();
-        double desiredY = -48;
-        destination.getY();
-        double desiredAngle = 0;
-        RobotMath.modAngleDegrees(destination.getHeading());
+        double desiredX = destination.getX();
+        double desiredY = destination.getY();
+        double desiredAngle = RobotMath.modAngleDegrees(destination.getHeading());
         SmartDashboard.putNumber("dtheta", desiredAngle);
-        speed = -.1;
+        
 
         // Finds where the robot is on the field
         pose = location.getPose();
@@ -72,7 +69,7 @@ public class WaypointTravel {
                     state = 3;
                 }
                 else {
-                    state = 1;
+                    state = 2;
                 }
                 drive.brake();
                 break;
@@ -115,15 +112,15 @@ public class WaypointTravel {
                         desiredX - pose.getX()) < RobotMap.POSITION_TOLERENCE)
                         && (Math.abs(desiredY - pose
                                 .getY()) < RobotMap.POSITION_TOLERENCE))) {
-                    double angle = findDesiresdAngle(desiredX, desiredY);
-                    double[] speeds = move(angle, speed);
+                    double[] speeds = move(headingDifference, speed);
                     drive.move(-speeds[1], -speeds[0]);
 
                 }
 
                 else {
                     drive.move(0.0, 0.0);
-                    state = 3;
+                    state = 4;  // FIX THIS TO ANGLE - should go to state 3 to
+                                // when complete with driving
                 }
 
                 break;
@@ -191,7 +188,9 @@ public class WaypointTravel {
 
         // Calculates the adjustment based on how much the robot needs to turn
         speedAdjustment = Math.max(0.0,
-                Math.min(0.2, (Math.abs(headingDifference) / 90)));
+                Math.min(0.2, (Math.abs(headingDifference) / 45)));
+
+        SmartDashboard.putNumber("proportion", speedAdjustment);
 
         // If the robot is going forward...
         if (speed > 0) {
@@ -282,6 +281,9 @@ public class WaypointTravel {
             leftThrust = 0.0;
             rightThrust = 0.0;
         }
+
+        SmartDashboard.putNumber("left auto", leftThrust);
+        SmartDashboard.putNumber("right auto", rightThrust);
 
         return new double[] { leftThrust, rightThrust };
     }

@@ -7,12 +7,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
-
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -38,7 +37,6 @@ public class Robot extends TimedRobot {
     OI oi;
     Shooter shooter;
     Turret turret;
-    JetsonLight jetsonLight;
 
     DeadReckoning location;
 
@@ -62,58 +60,80 @@ public class Robot extends TimedRobot {
     boolean done = false;
 
     int delay;
-    int counter = 0;
+    int counter ;
+
+    int teleopCounter;
+
+    boolean timeToMove = false;
+
+    String joshAutoSucks = "/home/lvuser/JoshAutoSucks.txt";
+    String charlieAutoGood = "/home/lvuser/TestAuto.txt";
+    String domCode = "/home/lvuser/DomSomething.txt";
+
+    // Changes made 3.9.20
+    // Climber: 
+        //Climber will start unlocked. Motors cannot raise or lower climber if locked.
+        //Put boolean on dashboard if climber is unlocked or locked (true if locked)
+        //Added code in teleopPeriodic() (Robot class) that prevents climber operations until last 30 seconds
+        //Unlikely we will use this timeout, so it is currently commented out
+    //Autonomous:
+        //Added a new command moveStraight (case sensitive) with arguments direction (forward or back),
+        //distance and speed, in that order (currentArg[0] is direction, must be "forward" or "back", 
+        //[1] is distance in inches, [2] is speed in %output). 
+        //This command uses clicks per inch only with no navx or waypoints.
+        //This command is added to the switch statement in Command class
+        //Uploaded text file that uses this command to the rio under the path above
+    //Turret:
+        //Automatically sets the turret to straight on (0 degrees) when teleop begins as per request by drive team
+        //Disabled use of (commented out) turret in teleop as per request by the drive team. 
+        //Will likely add back teleop turret usage later
 
     @Override
     public void robotInit() {
 
         try {
             map = new WaypointMap(new File("/home/lvuser/Waypoints2020.txt"));
-            autoScenario = new Scenario(new File("/home/lvuser/AutoPlay5.txt"));
-            SmartDashboard.putBoolean("Scenario loaded", false);
+            autoScenario = new Scenario(new File(charlieAutoGood));
+            SmartDashboard.putBoolean("File not found", false);
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
-            SmartDashboard.putBoolean("Scenario loaded", true);
-        }
+            SmartDashboard.putBoolean("File not found", true);
+        } 
 
+        receive = new UDPReceiver();
         oi = new OI();
         drive = new DriveTrain();
         intake = new Intake(oi);
-        shooter = new Shooter(oi, location, turret, map);
+        shooter = new Shooter(oi, location, turret, map, receive);
         index = new Indexing(oi, intake, shooter);
-        climb = new Climber(oi);
         turret = new Turret(oi);
+        climb = new Climber(oi, turret);
 
         imu = new IMU();
         send = new UDPSender();
-        receive = new UDPReceiver();
         location = new DeadReckoning(drive, imu, receive, map);
         guidence = new WaypointTravel(drive, location);
         nav = new Navigation(oi, drive, guidence);
-        jetsonLight = new JetsonLight(oi);
 
         receiverThread = new Thread(receive);
 
         camera0 = CameraServer.getInstance().startAutomaticCapture(0);
         camera1 = CameraServer.getInstance().startAutomaticCapture(1);
 
-
-        camera0 = CameraServer.getInstance().startAutomaticCapture(0);
-        camera1 = CameraServer.getInstance().startAutomaticCapture(1);
-
         compressor = new Compressor(RobotMap.PCM);
 
-        //SmartDashboard.putData("Auto Scenarios", autoChooser);
         auto = new Commander(autoScenario, map, location, guidence, intake,
-                index, shooter);
+                index, shooter, turret, drive);
 
-        receiverThread.start();
-
+        //receiverThread.start();
+        teleopCounter = 0;
     }
 
     @Override
     public void autonomousInit() {
+        drive.resetEncoderOffset();
+        compressor.setClosedLoopControl(true);
         location.reset();
     }
 
@@ -123,14 +143,17 @@ public class Robot extends TimedRobot {
         location.updateDashboard();
         index.updateBallPoitions();
         auto.periodic();
-
     }
 
     @Override
     public void teleopInit() {
         compressor.setClosedLoopControl(true);
-        location.reset();
         send.sendMessage();
+        drive.coast();
+        index.stopLoadShooter();
+        location.reset();
+        turret.setAngle(0);
+        climb.unlock();
     }
 
     @Override
@@ -138,13 +161,15 @@ public class Robot extends TimedRobot {
         location.updateTracker();
         location.updateDashboard();
         nav.navTeleopPeriodic();
-        climb.climberTeleopPeriodic();
+        //if(teleopCounter > 135 * 50) {
+            climb.climberTeleopPeriodic();
+        //}
         intake.intakeTeleopPeriodic();
         index.indexManualControls();
         shooter.shooterTeleopPeriodic();
         turret.turretTeleopPeriodic();
-        jetsonLight.jetsonLightPeriodic();
-        SmartDashboard.putString("pos", receive.getTargetPosition().toString());
+
+        //teleopCounter++;
     }
 
     @Override

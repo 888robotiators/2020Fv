@@ -97,7 +97,7 @@ public class RobotMap {
 
     public static final int TURRET_ENCODER_CHANNEL = 9;
 
-    public static final int SHOOTER_RPM_TOLERANCE = 100;
+    public static final int SHOOTER_RPM_TOLERANCE = 75;
 
     public static final double RPM_WHITELINE = 2750;
     public static final double RPM_COLORWHEEL = 3800;
@@ -109,5 +109,8 @@ public class RobotMap {
     public static final String[] RPM_SETPOINTS_NAMES = new String[] {"RPM_WHITELINE", "RPM_COLORWHEEL", "RPM_IDKBRV"};
 
     public static final double INDEX_MAX_SPEED = 0.5;
+
+    public static final double TURRET_CLICKS_PER_DEGREE = 225.0;
+    public static final double TURRET_ANGLE_TOLERANCE = 0.5;
 
 }

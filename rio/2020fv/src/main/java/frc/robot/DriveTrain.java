@@ -28,8 +28,8 @@ public class DriveTrain {
     CANEncoder leftEncoder;
     CANEncoder rightEncoder;
 
-    double rightEncoderOffset;
-    double leftEnccoderOffset;
+    double rightEncoderOffset = 0;
+    double leftEnccoderOffset = 0;
 
     boolean brake = false;
 

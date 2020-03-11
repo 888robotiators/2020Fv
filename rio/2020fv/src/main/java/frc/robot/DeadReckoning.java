@@ -231,6 +231,8 @@ public class DeadReckoning {
 
     }
 
+    /*
+    Currently is dead code
     private void checkVision() {
         if (receive.hasVision()) {
             Waypoint visionPose = receive.getTargetPosition();
@@ -247,6 +249,7 @@ public class DeadReckoning {
         }
     }
 
+    */
     /**
      * Resets tracking values to 0 or default.
      */

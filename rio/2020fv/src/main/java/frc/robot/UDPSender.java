@@ -12,9 +12,9 @@ import java.nio.ByteBuffer;
 public class UDPSender extends Thread {
 
     // declare the objects for sending data
-    private static DatagramSocket sock;
-    private DatagramPacket message;
-    private InetAddress jetsonAddress;
+    public static DatagramSocket sock;
+    DatagramPacket message;
+    InetAddress jetsonAddress;
 
     int cycle = 0;
 

@@ -25,6 +25,8 @@ public class Intake {
         intakeMotor.setInverted(true);
 
         this.oi = oi;
+
+        //intakeIn();
     }
 
     /**
@@ -50,6 +52,10 @@ public class Intake {
         flipButtonLast = flipButton;
 
         if (intakeFlipper.get().equals(DoubleSolenoid.Value.kForward)) {
+            intakeStop();
+        }
+        
+        else if (intakeFlipper.get().equals(DoubleSolenoid.Value.kReverse)) {
             intakeIn();
         }
 
@@ -74,11 +80,15 @@ public class Intake {
         }
     }
 
+    public DoubleSolenoid getFlipper() {
+        return intakeFlipper;
+    }
+
     /**
      * Runs the intake wheels in.
      */
     public void intakeIn() {
-        intakeMotor.set(ControlMode.PercentOutput, 1.0);
+        intakeMotor.set(ControlMode.PercentOutput, 0.75);
         isRunning = true;
     }
 
@@ -86,7 +96,7 @@ public class Intake {
      * Runs the intake wheels out.
      */
     public void intakeReverse() {
-        intakeMotor.set(ControlMode.PercentOutput, -1.0);
+        intakeMotor.set(ControlMode.PercentOutput, -0.75);
         isRunning = true;
     }
 
@@ -102,16 +112,15 @@ public class Intake {
      * Flips the intake arms out.
      */
     public void flipDown() {
-        if (intakeFlipper.get().equals(DoubleSolenoid.Value.kReverse))
-            intakeFlipper.set(DoubleSolenoid.Value.kForward);
+        intakeFlipper.set(DoubleSolenoid.Value.kReverse);
     }
 
     /**
      * Flips the intake arms in.
      */
+
     public void flipUp() {
-        if (intakeFlipper.get().equals(DoubleSolenoid.Value.kForward))
-            intakeFlipper.set(DoubleSolenoid.Value.kReverse);
+        intakeFlipper.set(DoubleSolenoid.Value.kForward);
     }
 
     /**

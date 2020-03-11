@@ -19,7 +19,7 @@ public class Indexing {
     TalonSRX lowerFunnelSideIndex;
     TalonSRX lowerFarSideIndex;
 
-    CANSparkMax upperBeltIndex;
+    //CANSparkMax upperBeltIndex;
     CANSparkMax loadingBeltIndex;
 
     // 0 is top, 4 is intake
@@ -50,14 +50,14 @@ public class Indexing {
                 RobotMap.LOWER_FUNNEL_SIDE_INDEX_CANID);
         lowerFarSideIndex = new TalonSRX(RobotMap.LOWER_FAR_SIDE_INDEX_CANID);
 
-        upperBeltIndex = new CANSparkMax(RobotMap.UPPER_BELT_CANID,
-                MotorType.kBrushless);
+        // upperBeltIndex = new CANSparkMax(RobotMap.UPPER_BELT_CANID,
+        //         MotorType.kBrushless);
         loadingBeltIndex = new CANSparkMax(RobotMap.LOADING_BELT_CANID,
                 MotorType.kBrushless);
 
-        funnelMotor.setInverted(true);
+        funnelMotor.setInverted(false);
 
-        upperBeltIndex.setInverted(true);
+        //upperBeltIndex.setInverted(true);
         loadingBeltIndex.setInverted(true);
 
         bannerPos0 = new DigitalInput(0);
@@ -90,7 +90,7 @@ public class Indexing {
             runLowerFunnelSideIndex(leftGamepadStick);
 
             autoLower = false;
-
+            
         }
 
         // Otherwise stop motors
@@ -156,7 +156,7 @@ public class Indexing {
             runFunnel(0.0);
         }
 
-        if (!banners[0] && banners[1]) {
+        if (!banners[0] && banners[1] || loading) {
             runUpperBelt(RobotMap.INDEX_MAX_SPEED);
             runLoadBelt(RobotMap.INDEX_MAX_SPEED);
         }
@@ -174,17 +174,12 @@ public class Indexing {
         runLoadBelt(0.0);
     }
 
-    public boolean loadShooter() {
-        if (ballInPos0) {
-            runLoadBelt(1.0);
-            runUpperBelt(1.0);
-            loading = true;
-            return false;
-        }
+    public void loadShooter() {
+        loading = true;
+    }
+
+    public void stopLoadShooter() {
         loading = false;
-        runLoadBelt(0.0);
-        runUpperBelt(0.0);
-        return true;
     }
 
     public boolean hasBalls() {
@@ -244,7 +239,7 @@ public class Indexing {
         // position
         if (!ballInPos4 || ballInPos3) ballInPos4 = !bannerPos4.get();
 
-        SmartDashboard.putBoolean("ball 0", bannerPos0.get());
+        SmartDashboard.putBoolean("ball 0", ballInPos0);
         SmartDashboard.putBoolean("ball 1", ballInPos1);
         SmartDashboard.putBoolean("ball 2", ballInPos2);
         SmartDashboard.putBoolean("ball 3", ballInPos3);
@@ -260,7 +255,7 @@ public class Indexing {
      * @param speed Percent output for the motor.
      */
     private void runFunnel(double speed) {
-        funnelMotor.set(ControlMode.PercentOutput, speed);
+        funnelMotor.set(ControlMode.PercentOutput, speed * 0.5);
     }
 
     /**
@@ -287,7 +282,7 @@ public class Indexing {
      * @param speed Percent output for the motor.
      */
     private void runUpperBelt(double speed) {
-        upperBeltIndex.set(speed);
+        //upperBeltIndex.set(speed);
     }
 
     /**
